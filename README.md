@@ -8,15 +8,15 @@
 
 ### Zespół:
 
-Szymon Błoszyk
+* [Szymon Błoszyk](https://github.com/Szymix)
 </br>
-Karol Kaczmarek
+* [Karol Kaczmarek](https://github.com/kaczla)
 </br>
-Mateusz Olejnik
+* [Mateusz Olejnik](https://github.com/Thume5770)
 </br>
-Gracjan Orzechowski
+* [Gracjan Orzechowski](https://github.com/Mehrunes)
 </br>
-Filip Trela
+* [Filip Trela](https://github.com/smutny)
 </br>
 </br>
 
