@@ -12,19 +12,20 @@ public class MySQL {
 	private String ConnectionDBAddres;
 	Connection ConnectionDB = null;
 	Statement StatementDB = null;
+	ResultSet ResultDB = null;
 	String UserName;
 	String UserPassword;
 	String SQLQueryString;
 	Boolean Connected = false;
 	
-	MySQL(){
+	public MySQL(){
 		this.Driver = "com.mysql.jdbc.Driver";
 		this.ConnectionDBAddres = "jdbc:mysql://localhost:3306/";
 		this.UserName = "root";
 		this.UserPassword = "root";
 	}
 	
-	MySQL( String driver, String connection_addres ){
+	public MySQL( String driver, String connection_addres ){
 		this.Driver = driver;
 		this.ConnectionDBAddres = connection_addres;
 		this.UserName = "root";
@@ -182,7 +183,7 @@ public class MySQL {
 	protected void DoQueryFromFile( String file ) throws SQLException, FileNotFoundException{
 		if( this.Connected ){
 			try{
-				InputStream FileName = new FileInputStream( file );
+				InputStream FileName = MySQL.class.getResourceAsStream( file );
 				System.out.println( "Doing query from file: " + file );
 				Scanner File = new Scanner( FileName );
 				File.useDelimiter("(;(\r)?\n)|(--\n)");
@@ -213,7 +214,7 @@ public class MySQL {
 	public static void main(String[] args) throws ClassNotFoundException,SQLException, FileNotFoundException{
 		MySQL Database = new MySQL();
 		Database.StartConnection();
-		Database.DoQueryFromFile( "/home/kaczla/github/TAS/MySQL/resources/query.sql" );
+		Database.DoQueryFromFile( "/query.sql" );
 		Database.finalize();
 	}
 }
