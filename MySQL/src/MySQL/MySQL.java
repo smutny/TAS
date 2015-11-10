@@ -1,10 +1,8 @@
 package MySQL;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.*;
-import java.util.Properties;
 import java.util.Scanner;
 
 public class MySQL {
