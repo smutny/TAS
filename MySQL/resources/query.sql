@@ -14,35 +14,35 @@ USE ONLINE_AUCTIONS;
 
 CREATE TABLE USERS(
 User_ID int NOT NULL AUTO_INCREMENT,
-Address varchar(255),
-Name_u varchar(255),
+Name varchar(255),
 Surname varchar(255),
-e_mail varchar(255),
-Phone_num int,
-pass varchar(255),
-PRIMARY KEY (User_ID)
-);
-
-CREATE TABLE ADDRESS(
-Address_id int NOT NULL AUTO_INCREMENT,
+Email varchar(255),
+Phone int,
+Login varchar(255) NOT NULL,
+Pass varchar(255) NOT NULL,
+Account int,
+Address varchar(255),
 Town varchar(255),
-zip_code varchar(255),
+ZipCode varchar(255),
 Street varchar(255),
-place_num int,
-User_ID int,
-PRIMARY KEY (Address_id),
-FOREIGN KEY (User_ID) REFERENCES USERS(User_ID)
+PRIMARY KEY (User_ID)
 );
 
 CREATE TABLE AUCTIONS(
 Auciton_ID int NOT NULL AUTO_INCREMENT, 
-User_ID int,
-Description varchar(255),
+User_ID int NOT NULL,
+Description varchar(255) NOT NULL,
 Start_Date datetime DEFAULT NOW(),
 End_Date datetime,
-acc_number INT,
+Price float NOT NULL,
 PRIMARY KEY (Auciton_ID),
 FOREIGN KEY (User_ID) REFERENCES USERS(User_ID)
+);
+
+CREATE TABLE IMAGES(
+ID int NOT NULL AUTO_INCREMENT,
+Image blob NOT NULL,
+Type varchar(255) NOT NULL
 );
 
 CREATE TABLE TYPE_PAYMENT(
