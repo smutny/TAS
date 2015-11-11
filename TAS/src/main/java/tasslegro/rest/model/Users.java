@@ -2,17 +2,17 @@ package tasslegro.rest.model;
 
 public class Users {
 	private int ID;
-	private String Login;
-	private String Pass;
-	private String Name;
-	private String Surname;
-	private String Email;
+	private String Login = "";
+	private String Pass = "";
+	private String Name = "";
+	private String Surname = "";
+	private String Email = "";
 	private int Phone;
 	private int Account;
-	private String Address;
-	private String Town;
-	private String ZipCode;
-	private String Street;
+	private String Address = "";
+	private String Town = "";
+	private String ZipCode = "";
+	private String Street = "";
 	
 	public Users(){	
 	}
