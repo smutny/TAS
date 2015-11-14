@@ -16,9 +16,9 @@ CREATE TABLE USERS(
 User_ID int NOT NULL AUTO_INCREMENT,
 Name varchar(255),
 Surname varchar(255),
-Email varchar(255),
+Email varchar(255) NOT NULL UNIQUE,
 Phone int,
-Login varchar(255) NOT NULL,
+Login varchar(255) NOT NULL UNIQUE,
 Pass varchar(255) NOT NULL,
 Account int,
 Address varchar(255),
@@ -29,7 +29,7 @@ PRIMARY KEY (User_ID)
 );
 
 CREATE TABLE AUCTIONS(
-Auciton_ID int NOT NULL AUTO_INCREMENT, 
+Auciton_ID int NOT NULL AUTO_INCREMENT,
 User_ID int NOT NULL,
 Description varchar(255) NOT NULL,
 Start_Date datetime DEFAULT NOW(),
