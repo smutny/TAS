@@ -10,4 +10,12 @@
       <servlet-name>tasslegro.rest.MyApplication</servlet-name>
       <url-pattern>/*</url-pattern>
    </servlet-mapping>
+   <filter>
+      <filter-name>ApiOriginFilter</filter-name>
+      <filter-class>tasslegro.rest.swagger.ApiOriginFilter</filter-class>
+   </filter>
+   <filter-mapping>
+      <filter-name>ApiOriginFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+   </filter-mapping>
 </web-app>

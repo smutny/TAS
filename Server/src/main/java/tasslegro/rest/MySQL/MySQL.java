@@ -138,7 +138,7 @@ public class MySQL {
 					User.setStreet( this.ResultDB.getString( "Street" ) );
 				}
 				else{
-					System.out.println("User " + id +  " not found!");
+					System.out.println("User with id: " + id +  " not found!");
 					this.ResultDB = null;
 					return null;
 				}
@@ -196,7 +196,7 @@ public class MySQL {
 		return null;
 	}
 	
-	public boolean checkUserByLogin( String login ){
+	public boolean checkExistUserByLogin( String login ){
 		if( this.Connected ){
 			try{
 				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
@@ -205,11 +205,36 @@ public class MySQL {
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
 				if( this.ResultDB.next() ){
 					this.ResultDB = null;
-					return false;
+					return true;
 				}
 				else{
 					this.ResultDB = null;
+					return false;
+				}
+			}
+			catch( SQLException error ){
+				error.printStackTrace();
+				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkExistUserByEmail( String email ){
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
+						+ "FROM ONLINE_AUCTIONS.USERS "
+						+ "WHERE Email = \"" + email+ "\"";
+				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
+				if( this.ResultDB.next() ){
+					this.ResultDB = null;
 					return true;
+				}
+				else{
+					this.ResultDB = null;
+					return false;
 				}
 			}
 			catch( SQLException error ){

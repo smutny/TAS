@@ -9,6 +9,10 @@ public class MainInfo {
 	@GET
 	@Produces("text/plain")
 	public String getMsg() {
-		return "Hello :)";
+		return "Hello :)\n"
+				+ "All path:\n" 
+				+ "\t/users - list all users\n" 
+				+ "\t/auctions - list all auctions\n"
+				+ "";
 	}
 }

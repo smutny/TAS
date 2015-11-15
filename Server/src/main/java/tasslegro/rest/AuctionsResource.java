@@ -13,15 +13,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import tasslegro.rest.MySQL.MySQL;
 import tasslegro.rest.model.Auctions;
 
-@Path("/Auctions")
+@Path("/auctions")
+@Api(value = "auctions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class AuctionsResource {
 	
 	@GET
+	@ApiOperation(value = "List all auctions.")
 	public List<Auctions> getMsg() throws ClassNotFoundException, SQLException {
     	MySQL tmp = new MySQL();
     	tmp.StartConnection();
