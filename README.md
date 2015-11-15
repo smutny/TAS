@@ -4,6 +4,10 @@
 ### Opis:
 
 </br>
+* [MySQL](MySQL/README.md)
+* [Server](Server/README.md)
+* [Client](Client/README.md)
+</br>
 </br>
 
 ### Zespół:
