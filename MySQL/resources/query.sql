@@ -24,7 +24,6 @@ Account int,
 Address varchar(255),
 Town varchar(255),
 ZipCode varchar(255),
-Street varchar(255),
 PRIMARY KEY (User_ID)
 );
 
@@ -42,7 +41,7 @@ FOREIGN KEY (User_ID) REFERENCES USERS(User_ID)
 CREATE TABLE IMAGES(
 ID int PRIMARY KEY AUTO_INCREMENT,
 Image blob NOT NULL,
-Type varchar(255) NOT NULL
+Name varchar(255) NOT NULL
 );
 
 CREATE TABLE TYPE_PAYMENT(

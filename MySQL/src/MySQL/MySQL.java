@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.Scanner;
+import java.util.Date;
 
 public class MySQL {
 	private String Driver;
@@ -38,7 +39,7 @@ public class MySQL {
 			}
 		}
 		catch( SQLException error ){
-			error.printStackTrace();
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
 		}
 		try{
 			if( this.ConnectionDB != null ){
@@ -46,31 +47,31 @@ public class MySQL {
 			}
 		}
 		catch( SQLException error ){
-			error.printStackTrace();
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
 		}
-		System.out.println( "Connection closed!" );
+		System.out.println( "[LOG] " + new Date() + ": Connection closed!" );
 	}
 	
 	protected void StartConnection() throws ClassNotFoundException, SQLException{
-		System.out.println( "Driver: " + this.Driver );
+		System.out.println( "[LOG] " + new Date() + ": Driver: " + this.Driver );
 		Class.forName( this.Driver );
 		try{
-			System.out.println( "Connecting: " + this.ConnectionDBAddres );
+			System.out.println( "[LOG] " + new Date() + ": Connecting: " + this.ConnectionDBAddres );
 			this.ConnectionDB = DriverManager.getConnection( this.ConnectionDBAddres, this.UserName, this.UserPassword );
-			System.out.println( "Connected!" );
-			System.out.println( "Creating: Statement" );
+			System.out.println( "[LOG] " + new Date() + ": Connected!" );
+			System.out.println( "[LOG] " + new Date() + ": Creating: Statement" );
 			this.StatementDB = this.ConnectionDB.createStatement();
-			System.out.println( "Created: Statement" );
+			System.out.println( "[LOG] " + new Date() + ": Created: Statement" );
 		}
 		catch( SQLException error ){
-			error.printStackTrace();
-			System.out.println( "Can not connect: " + this.ConnectionDBAddres );
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+			System.err.println( "[ERROR] " + new Date() + ": Can not connect: " + this.ConnectionDBAddres );
 			this.Connected = false;
 			return;
 		}
 		catch( Exception error ){
-			error.printStackTrace();
-			System.out.println( "Can not connect: " + this.ConnectionDBAddres );
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+			System.err.println( "[ERROR] " + new Date() + ": Can not connect: " + this.ConnectionDBAddres );
 			this.Connected = false;
 			return;
 		}
@@ -81,14 +82,14 @@ public class MySQL {
 	protected void CreateDatabase( String database ) throws SQLException{
 		if( this.Connected ){
 			try{
-				System.out.println( "Creating database: " + database );
+				System.out.println( "[LOG] " + new Date() + ": Creating database: " + database );
 				this.SQLQueryString = "CREATE DATABASE " + database;
 				this.StatementDB.executeUpdate( this.SQLQueryString );
-				System.out.println( "Created database: " + database );
+				System.out.println( "[LOG] " + new Date() + ": Created database: " + database );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not create database: " + database + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not create database: " + database + " in connection: "+ this.ConnectionDBAddres );
 				return;
 			}
 		}
@@ -98,14 +99,14 @@ public class MySQL {
 	protected void DropDatabase( String database ) throws SQLException{
 		if( this.Connected ){
 			try{
-				System.out.println( "Deleting database: " + database );
+				System.out.println( "[LOG] " + new Date() + ": Deleting database: " + database );
 				this.SQLQueryString = "DROP DATABASE " + database;
 				this.StatementDB.executeUpdate( this.SQLQueryString );
-				System.out.println( "Deleted database: " + database );
+				System.out.println( "[LOG] " + new Date() + ": Deleted database: " + database );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not delete database: " + database + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not delete database: " + database + " in connection: "+ this.ConnectionDBAddres );
 				return;
 			}
 		}
@@ -115,13 +116,13 @@ public class MySQL {
 	protected void ChangeDatabase( String database ) throws SQLException{
 		if( this.Connected ){
 			try{
-				System.out.println( "Changing database: " + database );
+				System.out.println( "[LOG] " + new Date() + ": Changing database: " + database );
 				this.ConnectionDB.setCatalog( database );
-				System.out.println( "Changed database: " + database );
+				System.out.println( "[LOG] " + new Date() + ": Changed database: " + database );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not change database: " + database + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not change database: " + database + " in connection: "+ this.ConnectionDBAddres );
 				return;
 			}
 		}
@@ -131,14 +132,14 @@ public class MySQL {
 	protected void CreateTable( String table ) throws SQLException{
 		if( this.Connected ){
 			try{
-				System.out.println( "Creating table: " + table );
+				System.out.println( "[LOG] " + new Date() + ": Creating table: " + table );
 				this.SQLQueryString = "CREATE TABLE " + table;
 				this.StatementDB.executeUpdate( this.SQLQueryString );
-				System.out.println( "Created table: " + table );
+				System.out.println( "[LOG] " + new Date() + ": Created table: " + table );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not create table: " + table + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not create table: " + table + " in connection: "+ this.ConnectionDBAddres );
 				return;
 			}
 		}
@@ -148,14 +149,14 @@ public class MySQL {
 	protected void DropTable( String table ) throws SQLException{
 		if( this.Connected ){
 			try{
-				System.out.println( "Deleting table: " + table );
+				System.out.println( "[LOG] " + new Date() + ": Deleting table: " + table );
 				this.SQLQueryString = "DROP TABLE " + table;
 				this.StatementDB.executeUpdate( this.SQLQueryString );
-				System.out.println( "Deleted table: " + table );
+				System.out.println( "[LOG] " + new Date() + ": Deleted table: " + table );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not delate table: " + table + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not delate table: " + table + " in connection: "+ this.ConnectionDBAddres );
 				return;
 			}
 		}
@@ -165,14 +166,14 @@ public class MySQL {
 	protected void DoQuery( String query ) throws SQLException{
 		if( this.Connected ){
 			try{
-				System.out.println( "Doing query: " + query );
+				System.out.println( "[LOG] " + new Date() + ": Doing query: " + query );
 				this.SQLQueryString = query;
 				this.StatementDB.executeUpdate( this.SQLQueryString );
-				System.out.println( "Done query:" + query );
+				System.out.println( "[LOG] " + new Date() + ": Done query:" + query );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + query + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + query + " in connection: "+ this.ConnectionDBAddres );
 				return;
 			}
 		}
@@ -182,12 +183,12 @@ public class MySQL {
 		if( this.Connected ){
 			try{
 				InputStream FileName = MySQL.class.getResourceAsStream( file );
-				System.out.println( "Doing query from file: " + file );
+				System.out.println( "[LOG] " + new Date() + ": Doing query from file: " + file );
 				Scanner File = new Scanner( FileName );
 				File.useDelimiter("(;(\r)?\n)|(--\n)");
 				while( File.hasNext() ){
 					String line = File.next();
-					System.out.println( "Doing query: " + line );
+					System.out.println( "[LOG] " + new Date() + ": Doing query: " + line );
 					if( line.startsWith( "/*!" ) && line.endsWith( "*/" ) ){
 						int i = line.indexOf( ' ' );
 						line = line.substring( i + 1, line.length() - " */".length() );
@@ -199,11 +200,11 @@ public class MySQL {
 					System.out.println();
 				}
 				File.close();
-				System.out.println( "Done query from file: " + file );
+				System.out.println( "[LOG] " + new Date() + ": Done query from file: " + file );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + file + " in connection: " + this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + file + " in connection: " + this.ConnectionDBAddres );
 				return;	
 			}
 		}
