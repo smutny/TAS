@@ -31,7 +31,7 @@ public class MySQL {
 		this.UserPassword = "root";
 	}
 	
-	protected void finalize(){
+	public void finalize() {
 		this.Connected = false;
 		try{
 			if( this.StatementDB != null ){
