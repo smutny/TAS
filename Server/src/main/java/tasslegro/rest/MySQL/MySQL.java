@@ -5,7 +5,9 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import tasslegro.rest.model.*;
@@ -37,6 +39,10 @@ public class MySQL {
 		this.StartConnection();
 	}
 	
+	public Connection getConnection(){
+		return this.ConnectionDB;
+	}
+	
 	public void finalize(){
 		this.Connected = false;
 		try{
@@ -45,7 +51,7 @@ public class MySQL {
 			}
 		}
 		catch( SQLException error ){
-			error.printStackTrace();
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
 		}
 		try{
 			if( this.ConnectionDB != null ){
@@ -53,7 +59,7 @@ public class MySQL {
 			}
 		}
 		catch( SQLException error ){
-			error.printStackTrace();
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
 		}
 	}
 	
@@ -64,14 +70,14 @@ public class MySQL {
 			this.StatementDB = this.ConnectionDB.createStatement();
 		}
 		catch( SQLException error ){
-			error.printStackTrace();
-			System.out.println( "Can not connect: " + this.ConnectionDBAddres );
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+			System.err.println( "[ERROR] " + new Date() + ": Can not connect: " + this.ConnectionDBAddres );
 			this.Connected = false;
 			return;
 		}
 		catch( Exception error ){
-			error.printStackTrace();
-			System.out.println( "Can not connect: " + this.ConnectionDBAddres );
+			System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+			System.err.println( "[ERROR] " + new Date() + ": Can not connect: " + this.ConnectionDBAddres );
 			this.Connected = false;
 			return;
 		}
@@ -85,7 +91,7 @@ public class MySQL {
 	public List<Users> getUsers() throws SQLException{
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
 						+ "FROM ONLINE_AUCTIONS.USERS";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
 				List<Users> UserList = new ArrayList<>();
@@ -101,15 +107,15 @@ public class MySQL {
 					User.setAddress( this.ResultDB.getString( "Address" ) );
 					User.setTown( this.ResultDB.getString( "Town" ) );
 					User.setZipCode( this.ResultDB.getString( "ZipCode" ) );
-					User.setStreet( this.ResultDB.getString( "Street" ) );
 					UserList.add( User );
 				}
 				this.ResultDB = null;
 				return UserList;
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return null;
 			}
 		}
@@ -119,7 +125,7 @@ public class MySQL {
 	public Users getUserById( String id ) throws SQLException{
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE User_ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -135,10 +141,9 @@ public class MySQL {
 					User.setAddress( this.ResultDB.getString( "Address" ) );
 					User.setTown( this.ResultDB.getString( "Town" ) );
 					User.setZipCode( this.ResultDB.getString( "ZipCode" ) );
-					User.setStreet( this.ResultDB.getString( "Street" ) );
 				}
 				else{
-					System.out.println("User with id: " + id +  " not found!");
+					System.out.println( "[LOG] " + new Date() + ": User with id: " + id +  " not found!" );
 					this.ResultDB = null;
 					return null;
 				}
@@ -146,8 +151,9 @@ public class MySQL {
 				return User;
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return null;
 			}
 		}
@@ -161,7 +167,7 @@ public class MySQL {
 	public Users getUserByLogin( String login ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE Login = \"" + login + "\"";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -177,10 +183,9 @@ public class MySQL {
 					User.setAddress( this.ResultDB.getString( "Address" ) );
 					User.setTown( this.ResultDB.getString( "Town" ) );
 					User.setZipCode( this.ResultDB.getString( "ZipCode" ) );
-					User.setStreet( this.ResultDB.getString( "Street" ) );
 				}
 				else{
-					System.out.println("User " + login +  " not found!");
+					System.out.println( "[LOG] " + new Date() + ": User " + login +  " not found!" );
 					this.ResultDB = null;
 					return null;
 				}
@@ -188,8 +193,9 @@ public class MySQL {
 				return User;
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return null;
 			}
 		}
@@ -199,7 +205,7 @@ public class MySQL {
 	public boolean checkExistUserByLogin( String login ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE Login = \"" + login + "\"";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -213,8 +219,9 @@ public class MySQL {
 				}
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return false;
 			}
 		}
@@ -224,7 +231,7 @@ public class MySQL {
 	public boolean checkExistUserByEmail( String email ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode, Street "
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE Email = \"" + email+ "\"";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -238,18 +245,49 @@ public class MySQL {
 				}
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return false;
 			}
 		}
 		return false;
 	}
 	
+	public boolean checkExistUserById( String id ){
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
+						+ "FROM ONLINE_AUCTIONS.USERS "
+						+ "WHERE User_ID = " + id + ";";
+				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
+				if( this.ResultDB.next() ){
+					this.ResultDB = null;
+					return true;
+				}
+				else{
+					this.ResultDB = null;
+					return false;
+				}
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkExistUserById( int  id ){
+		return this.checkExistUserById( Integer.toString( id ) );
+	}
+	
 	public Users addUser( Users user ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.USERS(Name, Surname, Email, Phone, Login, Pass, Account, Address, Town, ZipCode, Street)"
+				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.USERS(Name, Surname, Email, Phone, Login, Pass, Account, Address, Town, ZipCode)"
 						+ "VALUES (\""
 					+ user.getName() + "\", \""
 					+ user.getSurname() + "\", \""
@@ -260,14 +298,13 @@ public class MySQL {
 					+ user.getAccount() + ", \""
 					+ user.getAddress() + "\", \""
 					+ user.getTown() + "\", \""
-					+ user.getZipCode() + "\", \""
-					+ user.getStreet() + "\");";
+					+ user.getZipCode() + "\" );";
 				this.StatementDB.executeUpdate( this.SQLQueryString );
 				return getUserByLogin( user.getLogin() );
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return null;
 			}
 		}
@@ -281,7 +318,7 @@ public class MySQL {
 	public List<Auctions> getAuctions() throws SQLException{
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Description, Start_Date, End_Date, Price "
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Title, Description, Start_Date, End_Date, Price "
 						+ "FROM ONLINE_AUCTIONS.AUCTIONS";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
 				List<Auctions> AuctionList = new ArrayList<>();
@@ -289,6 +326,7 @@ public class MySQL {
 					Auctions Auction = new Auctions();
 					Auction.setAuciton_ID( this.ResultDB.getInt( "Auciton_ID" ) );
 					Auction.setUser_ID( this.ResultDB.getInt( "User_ID" ) );
+					Auction.setTitle( this.ResultDB.getString( "Title" ) );
 					Auction.setDescription( this.ResultDB.getString( "Description" ) );
 					Auction.setStart_Date( this.ResultDB.getString( "Start_Date" ) );
 					Auction.setEnd_Date( this.ResultDB.getString( "End_Date" ) );
@@ -299,8 +337,69 @@ public class MySQL {
 				return AuctionList;
 			}
 			catch( SQLException error ){
-				error.printStackTrace();
-				System.out.println( "Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public Auctions addAuction( Auctions auction ){
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.AUCTIONS(User_ID, Title, Description, Start_Date, End_Date, Price)"
+						+ "VALUES (\""
+					+ auction.getUser_ID() + "\", \""
+					+ auction.getTitle() + "\", \""
+					+ auction.getDescription() + "\", "
+					+ "NOW(), "
+					+ "DATE_ADD(NOW(),INTERVAL 2 WEEK), "
+					+ auction.getPrice() + " );";
+				this.StatementDB.executeUpdate( this.SQLQueryString );
+				return getAuctionByTitleDescriptionId( auction );
+			}
+			catch( SQLException error ){
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public Auctions getAuctionByTitleDescriptionId( Auctions auction ){
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Title, Description, Start_Date, End_Date, Price "
+						+ "FROM ONLINE_AUCTIONS.AUCTIONS WHERE User_ID = "
+					+ auction.getUser_ID() + " AND Title = \""
+					+ auction.getTitle() + "\" AND Description = \""
+					+ auction.getDescription() + "\";";
+				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
+				Auctions tmp = new Auctions();
+				if( this.ResultDB.next() ){
+					tmp.setAuciton_ID( this.ResultDB.getInt( "Auciton_ID" ) );
+					tmp.setUser_ID( this.ResultDB.getInt( "User_ID" ) );
+					tmp.setTitle( this.ResultDB.getString( "Title" ) );
+					tmp.setDescription( this.ResultDB.getString( "Description" ) );
+					tmp.setStart_Date( this.ResultDB.getString( "Start_Date" ) );
+					tmp.setEnd_Date( this.ResultDB.getString( "End_Date" ) );
+					tmp.setPrice( this.ResultDB.getFloat( "Price" ) );
+				}
+				else{
+					System.out.println( "[LOG] " + new Date() + ": Auction with title \"" + auction.getTitle() +  "\" not found!" );
+					this.ResultDB = null;
+					return null;
+				}
+				this.ResultDB = null;
+				return tmp;
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
 				return null;
 			}
 		}

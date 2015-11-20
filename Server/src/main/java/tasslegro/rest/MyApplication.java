@@ -5,9 +5,7 @@ import io.swagger.jaxrs.config.BeanConfig;
 
 public class MyApplication extends ResourceConfig {
    public MyApplication (){
-      register(MainInfo.class);
-      register(UsersResource.class);
-      register(AuctionsResource.class);
+      packages("tasslegro");
       packages("io.swagger.jaxrs.listing");
 
       BeanConfig beanConfig = new BeanConfig();

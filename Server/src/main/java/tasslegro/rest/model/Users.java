@@ -12,14 +12,14 @@ public class Users {
 	private String Address = "";
 	private String Town = "";
 	private String ZipCode = "";
-	private String Street = "";
 	
 	public Users(){	
 	}
 	
-	public Users( String login, String pass ){
+	public Users( String login, String pass, String email ){
 		this.Login = login;
 		this.Pass = pass;
+		this.Email = email;
 	}
 	
 	public int getID() {
@@ -108,13 +108,5 @@ public class Users {
 
 	public void setZipCode(String zipCode) {
 		this.ZipCode = zipCode;
-	}
-
-	public String getStreet() {
-		return this.Street;
-	}
-
-	public void setStreet(String street) {
-		this.Street = street;
 	}
 }

@@ -3,9 +3,10 @@ package tasslegro.rest.model;
 public class Auctions {
 	private int Auciton_ID;
 	private int User_ID;
-	private String Description;
-	private String Start_Date;
-	private String End_Date;
+	private String Title = "";
+	private String Description = "";
+	private String Start_Date = "";
+	private String End_Date = "";
 	private float Price;
 	
 	public Auctions() {	
@@ -27,6 +28,14 @@ public class Auctions {
 		this.User_ID = user_ID;
 	}
 	
+	public String getTitle() {
+		return this.Title;
+	}
+
+	public void setTitle(String title) {
+		this.Title = title;
+	}
+	
 	public String getDescription() {
 		return this.Description;
 	}
@@ -34,6 +43,7 @@ public class Auctions {
 	public void setDescription(String description) {
 		this.Description = description;
 	}
+	
 	public String getStart_Date() {
 		return this.Start_Date;
 	}
