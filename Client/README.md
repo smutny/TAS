@@ -20,6 +20,8 @@ MySQL 5.6.27
 </br>
 Apache Maven 3.3.3
 </br>
+Vaadin Framework 7.5.9
+</br>
 </br>
 
 #### Pakiety dla Ubuntu:
