@@ -39,6 +39,9 @@ public class AuctionsResource {
 	@GET
 	@ApiOperation(value = "Get list all auctions.")
 	public Response getAuctions() throws ClassNotFoundException, SQLException {
+		if( ! this.database.IsConnected() ){
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( "Problem with server! Please try again later!\n" ).build();
+		}
     	List<Auctions> AuctionsList = this.database.getAuctions();
     	if( AuctionsList == null ){
     		return Response.status( Response.Status.NO_CONTENT ).entity( "No content!" ).build();
@@ -51,6 +54,9 @@ public class AuctionsResource {
 	@POST
 	@ApiOperation(value = "Add auction.")
     public Response addAuction( Auctions auction ) throws ClassNotFoundException, SQLException{
+		if( ! this.database.IsConnected() ){
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( "Problem with server! Please try again later!\n" ).build();
+		}
 			/*
 			 * INSERT
 			 curl -i -H "Content-Type: application/json" -X POST -d '{"user_ID":1, "title":"Mis", "description":"Pluszowy miś", "price":15.0}' localhost:8080/auctions 
@@ -68,7 +74,7 @@ public class AuctionsResource {
 			return Response.status( Response.Status.NOT_ACCEPTABLE ).entity( "User ID is required!\n" ).build();
 		}
 		else if( this.database.checkExistUserById( auction.getUser_ID() ) == false ){
-			return Response.status( Response.Status.CONFLICT ).entity( "User with id: " + auction.getUser_ID() + " not found!\n" ).build();
+			return Response.status( Response.Status.CONFLICT ).entity( "User with id \"" + auction.getUser_ID() + "\" not found!\n" ).build();
 		}
 		else{
 			Auctions tmp = this.database.addAuction( auction );
@@ -79,5 +85,15 @@ public class AuctionsResource {
 	    		return Response.status( Response.Status.CREATED ).entity( tmp ).build();
 			}
 		}
+	}
+	
+	@Path("/{id}")
+	@GET
+	@ApiOperation(value = "Get user {id} auctions.")
+	public Response getUser( @PathParam("id") final String id ) throws ClassNotFoundException, SQLException {
+		if( ! this.database.IsConnected() ){
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( "Problem with server! Please try again later!\n" ).build();
+		}
+		return null;
 	}
 }

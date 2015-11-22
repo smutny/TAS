@@ -14,23 +14,23 @@ USE ONLINE_AUCTIONS;
 
 CREATE TABLE USERS(
 User_ID int NOT NULL AUTO_INCREMENT,
-Name varchar(255),
-Surname varchar(255),
-Email varchar(255) NOT NULL UNIQUE,
+Name varchar(128),
+Surname varchar(128),
+Email varchar(128) NOT NULL UNIQUE,
 Phone int,
-Login varchar(255) NOT NULL UNIQUE,
-Pass varchar(255) NOT NULL,
+Login varchar(128) NOT NULL UNIQUE,
+Pass varchar(128) NOT NULL,
 Account int,
-Address varchar(255),
-Town varchar(255),
-ZipCode varchar(255),
+Address varchar(128),
+Town varchar(128),
+ZipCode varchar(10),
 PRIMARY KEY (User_ID)
 );
 
 CREATE TABLE AUCTIONS(
 Auciton_ID int NOT NULL AUTO_INCREMENT,
 User_ID int NOT NULL,
-Title varchar(255) NOT NULL,
+Title varchar(128) NOT NULL,
 Description varchar(255) NOT NULL,
 Start_Date datetime DEFAULT NOW(),
 End_Date datetime,
@@ -41,8 +41,7 @@ FOREIGN KEY (User_ID) REFERENCES USERS(User_ID)
 
 CREATE TABLE IMAGES(
 ID int PRIMARY KEY AUTO_INCREMENT,
-Image blob NOT NULL,
-Name varchar(255) NOT NULL
+Image MEDIUMBLOB NOT NULL
 );
 
 CREATE TABLE TYPE_PAYMENT(
@@ -112,3 +111,7 @@ FOREIGN KEY (Auction_ID) REFERENCES AUCTIONS(Auciton_ID),
 FOREIGN KEY (Sender_ID) REFERENCES USERS(User_ID),
 FOREIGN KEY (Addressee_ID) REFERENCES USERS(User_ID)
 );
+
+INSERT INTO USERS( Name, Surname, Email, Phone, Login, Pass, Account, Address, Town, ZipCode )
+VALUES ( "", "", "admin@tasslegro.com", 123456789, "admin", "pass123", 0, "", "", "" ),
+( "Adam", "Nowak", "nowakadam@gmail.com", 0, "nowak", "abc123", 0, "Plac Wolności 22/4", "Warszawa", "11444");

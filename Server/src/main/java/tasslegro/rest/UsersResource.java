@@ -36,22 +36,28 @@ public class UsersResource{
 	public void finaly(){
 		this.database.finalize();
 	}
-
+	
 	@GET
-    @ApiOperation(value = "Get list all users.")
+	@ApiOperation(value = "Get list all users.")
 	public Response getUsers() throws ClassNotFoundException, SQLException {
-    	List<Users> UserList = this.database.getUsers();
-    	if( UserList == null ){
-    		return Response.status( Response.Status.NO_CONTENT ).entity( "No content!" ).build();
-    	}
-    	else{
-    		return Response.status( Response.Status.OK ).entity( UserList ).build();
-    	}
+		if( ! this.database.IsConnected() ){
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( "Problem with server! Please try again later!\n" ).build();
+		}
+		List<Users> UserList = this.database.getUsers();
+		if( UserList == null ){
+			return Response.status( Response.Status.NO_CONTENT ).entity( "No content!" ).build();
+		}
+		else{
+			return Response.status( Response.Status.OK ).entity( UserList ).build();
+		}
 	}
-
+	
 	@POST
 	@ApiOperation(value = "Add user.")
     public Response addUser( Users user ) throws ClassNotFoundException, SQLException{
+		if( ! this.database.IsConnected() ){
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( "Problem with server! Please try again later!\n" ).build();
+		}
 	    	/*
 			 * INSERT
 			 curl -i -H "Content-Type: application/json" -X POST -d '{"login":"login123", "pass":"pass123", "email":"login123@abc.com", "address":"Address123", "town":"Town123", "zipCode":"ZipCode123", "surname":"Nazwisko123", "phone":123123123, "account":111222333, "name":"Imie123" }' http://localhost:8080/users
@@ -82,13 +88,16 @@ public class UsersResource{
     	}
     }
     
-	@Path("/{id}")
+	@Path("/{login}")
 	@GET
-	@ApiOperation(value = "Get all users with {id}.")
-    public Response getUser( @PathParam("id") final String id ) throws ClassNotFoundException, SQLException {
-    	Users User = this.database.getUserById( id );
+	@ApiOperation(value = "Get all users with {login}.")
+    public Response getUser( @PathParam("login") final String login ) throws ClassNotFoundException, SQLException {
+		if( ! this.database.IsConnected() ){
+			return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).entity( "Problem with server! Please try again later!\n" ).build();
+		}
+    	Users User = this.database.getUserByLogin( login );
     	if( User == null ){
-    		return Response.status( Response.Status.NOT_FOUND ).entity( "User with id: " + id +  " not found!\n" ).build();
+    		return Response.status( Response.Status.NOT_FOUND ).entity( "User with login \"" + login +  "\" not found!\n" ).build();
     	}
     	else{
     		return Response.status( Response.Status.FOUND ).entity( User ).build();

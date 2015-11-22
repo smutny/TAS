@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.List;
 import tasslegro.rest.model.*;
 
 public class MySQL {
+	
 	private String Driver;
 	private String ConnectionDBAddres;
 	Connection ConnectionDB = null;
@@ -41,6 +43,10 @@ public class MySQL {
 	
 	public Connection getConnection(){
 		return this.ConnectionDB;
+	}
+	
+	public boolean IsConnected(){
+		return this.Connected;
 	}
 	
 	public void finalize(){
@@ -205,7 +211,7 @@ public class MySQL {
 	public boolean checkExistUserByLogin( String login ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
+				this.SQLQueryString = "SELECT User_ID "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE Login = \"" + login + "\"";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -231,7 +237,7 @@ public class MySQL {
 	public boolean checkExistUserByEmail( String email ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
+				this.SQLQueryString = "SELECT User_ID "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE Email = \"" + email+ "\"";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -257,7 +263,7 @@ public class MySQL {
 	public boolean checkExistUserById( String id ){
 		if( this.Connected ){
 			try{
-				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
+				this.SQLQueryString = "SELECT User_ID "
 						+ "FROM ONLINE_AUCTIONS.USERS "
 						+ "WHERE User_ID = " + id + ";";
 				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
@@ -359,6 +365,23 @@ public class MySQL {
 					+ auction.getPrice() + " );";
 				this.StatementDB.executeUpdate( this.SQLQueryString );
 				return getAuctionByTitleDescriptionId( auction );
+//				this.ResultDB = this.StatementDB.getGeneratedKeys();
+//				if( this.ResultDB.next() ){
+//					Auctions tmp = new Auctions();
+//					tmp.setAuciton_ID( this.ResultDB.getInt( "Auciton_ID" ) );
+//					tmp.setUser_ID( this.ResultDB.getInt( "User_ID" ) );
+//					tmp.setTitle( this.ResultDB.getString( "Title" ) );
+//					tmp.setDescription( this.ResultDB.getString( "Description" ) );
+//					tmp.setStart_Date( this.ResultDB.getString( "Start_Date" ) );
+//					tmp.setEnd_Date( this.ResultDB.getString( "End_Date" ) );
+//					tmp.setPrice( this.ResultDB.getFloat( "Price" ) );
+//					this.ResultDB = null;
+//					return tmp;
+//				}
+//				else{
+//					this.ResultDB = null;
+//					return null;
+//				}
 			}
 			catch( SQLException error ){
 				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
@@ -404,5 +427,151 @@ public class MySQL {
 			}
 		}
 		return null;
+	}
+	
+	/*
+	 * IMAGES *
+	 */
+	
+	public List<Images> getImagesList() throws SQLException{
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "SELECT ID "
+						+ "FROM ONLINE_AUCTIONS.IMAGES";
+				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
+				List<Images> ImageList = new ArrayList<>();
+				while( this.ResultDB.next() ){
+					Images Image = new Images();
+					Image.setId( this.ResultDB.getInt( "ID" ) );
+					ImageList.add( Image );
+				}
+				this.ResultDB = null;
+				return ImageList;
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public Images addImage( Images image ) throws SQLException{
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.IMAGES(Image) VALUES(?)";
+				PreparedStatement pre = this.ConnectionDB.prepareStatement( this.SQLQueryString );
+				pre.setBlob( 1, image.getImage() );
+				pre.executeUpdate();
+				this.ResultDB = pre.getGeneratedKeys();
+				if( this.ResultDB.next() ){
+					Images tmp = new Images();
+					tmp.setId( this.ResultDB.getInt( 1 ) );
+					this.ResultDB = null;
+					return tmp;
+				}
+				else{
+					this.ResultDB = null;
+					return null;
+				}
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public Images getImageById( String id ) throws SQLException{
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "SELECT ID, Image "
+						+ "FROM ONLINE_AUCTIONS.IMAGES "
+						+ "WHERE ID = "
+						+ id
+						+ ";";
+				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
+				Images Image = new Images();
+				if( this.ResultDB.next() ){
+					Image.setId( this.ResultDB.getInt( "ID" ) );
+					Image.setImage( this.ResultDB.getBinaryStream( "Image" ) );
+				}
+				else{
+					this.ResultDB = null;
+					return null;
+				}
+				this.ResultDB = null;
+				return Image;
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public Images deleteImageById( String id ){
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "DELETE "
+						+ "FROM ONLINE_AUCTIONS.IMAGES "
+						+ "WHERE ID = "
+						+ id
+						+ ";";
+				this.StatementDB.executeUpdate( this.SQLQueryString );
+				Images tmp = new Images();
+				tmp.setId( Integer.parseInt( id ) );
+				return tmp;
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return null;
+			}
+		}
+		return null;
+	}
+	
+	public Images deleteImageById( int id ){
+		return this.deleteImageById( Integer.toString( id ) );
+	}
+	
+	public boolean checkExistImageById( String id ){
+		if( this.Connected ){
+			try{
+				this.SQLQueryString = "SELECT ID "
+						+ "FROM ONLINE_AUCTIONS.IMAGES";
+				this.ResultDB = this.StatementDB.executeQuery( this.SQLQueryString );
+				if( this.ResultDB.next() ){
+					Images Image = new Images();
+					Image.setId( this.ResultDB.getInt( "ID" ) );
+					return true;
+				}
+				else{
+					this.ResultDB = null;
+					return false;
+				}
+			}
+			catch( SQLException error ){
+				this.ResultDB = null;
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString + " in connection: "+ this.ConnectionDBAddres );
+				return false;
+			}
+		}
+		return false;
+	}
+	
+	public boolean checkExistImageById( int id ){
+		return checkExistImageById( Integer.toString( id ) );
 	}
 }

@@ -1,12 +1,18 @@
 package MySQL;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.*;
 import java.util.Scanner;
+
 import java.util.Date;
 
 public class MySQL {
+	
 	private String Driver;
 	private String ConnectionDBAddres;
 	Connection ConnectionDB = null;
@@ -210,10 +216,41 @@ public class MySQL {
 		}
 	}
 	
+	protected void addImage( String image ){
+		if( this.Connected ){
+			URL imagePath = this.getClass().getClassLoader().getResource( image );
+			System.out.println( "[LOG] " + new Date() + ": Adding image: " + imagePath );
+			File file = null;
+			try {
+				file = new File( imagePath.toURI() );
+			} catch ( URISyntaxException error ) {
+				file = new File( imagePath.getPath() );
+			}
+			FileInputStream buff = null;
+			try {
+				buff = new FileInputStream( file );
+			} catch ( FileNotFoundException error ) {
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not load image: " + imagePath.getPath() + " in connection: " + this.ConnectionDBAddres );
+			}
+			try {
+				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.IMAGES(Image) VALUES(?)";
+				PreparedStatement pre = this.ConnectionDB.prepareStatement( this.SQLQueryString, Statement.RETURN_GENERATED_KEYS );
+				pre.setBlob( 1, buff );
+				pre.executeUpdate();
+			} catch ( SQLException error ) {
+				System.err.println( "[ERROR] " + new Date() + ": " + error.getMessage() );
+				System.err.println( "[ERROR] " + new Date() + ": Can not load image: " + imagePath.getPath() + " in connection: " + this.ConnectionDBAddres );
+			}
+			System.out.println( "[LOG] " + new Date() + ": Added image: " + imagePath );
+		}
+	}
+	
 	public static void main(String[] args) throws ClassNotFoundException,SQLException, FileNotFoundException{
 		MySQL Database = new MySQL();
 		Database.StartConnection();
 		Database.DoQueryFromFile( "/query.sql" );
+		Database.addImage( "error.png" );
 		Database.finalize();
 	}
 }
