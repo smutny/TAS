@@ -58,6 +58,7 @@ W każdym folderze znajdują się niezbędne dane do zaimportowania praojektu do
 W pracach wykorzystaliśmy: [Eclipse IDE for Java EE Developers](https://www.eclipse.org/downloads)
 * Eclipse Java EE IDE for Web Developers.
 * Version: Mars.1 Release (4.5.1)
+
 </br>
 Aplikacja kliencka wykorzystuje: [Vaadin Framework 7.5.9](https://vaadin.com/home)
 </br>

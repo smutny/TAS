@@ -12,16 +12,16 @@ public class Users {
 	private String Address = "";
 	private String Town = "";
 	private String ZipCode = "";
-	
-	public Users(){	
+
+	public Users() {
 	}
-	
-	public Users( String login, String pass, String email ){
+
+	public Users(String login, String pass, String email) {
 		this.Login = login;
 		this.Pass = pass;
 		this.Email = email;
 	}
-	
+
 	public int getID() {
 		return this.ID;
 	}
