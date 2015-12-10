@@ -31,7 +31,7 @@ public class AuctionsResource {
 		this.database = new MySQL();
 	}
 
-	public void finaly() {
+	public void finalize() {
 		this.database.finalize();
 	}
 
