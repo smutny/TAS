@@ -1,71 +1,79 @@
 package tasslegro.rest.model;
 
 public class Auctions {
-	private int Auciton_ID;
-	private int User_ID;
-	private String Title = "";
-	private String Description = "";
-	private String Start_Date = "";
-	private String End_Date = "";
-	private float Price;
+	private int auciton_ID;
+	private int user_ID;
+	private int image_ID;
+	private String title = "";
+	private String description = "";
+	private String start_Date = "";
+	private String end_Date = "";
+	private float price;
 
 	public Auctions() {
 	}
 
 	public int getAuciton_ID() {
-		return this.Auciton_ID;
+		return this.auciton_ID;
 	}
 
 	public void setAuciton_ID(int auciton_ID) {
-		this.Auciton_ID = auciton_ID;
+		this.auciton_ID = auciton_ID;
 	}
 
 	public int getUser_ID() {
-		return this.User_ID;
+		return this.user_ID;
 	}
 
 	public void setUser_ID(int user_ID) {
-		this.User_ID = user_ID;
+		this.user_ID = user_ID;
+	}
+
+	public int getImage_ID() {
+		return this.image_ID;
+	}
+
+	public void setImage_ID(int image_ID) {
+		this.image_ID = image_ID;
 	}
 
 	public String getTitle() {
-		return this.Title;
+		return this.title;
 	}
 
 	public void setTitle(String title) {
-		this.Title = title;
+		this.title = title;
 	}
 
 	public String getDescription() {
-		return this.Description;
+		return this.description;
 	}
 
 	public void setDescription(String description) {
-		this.Description = description;
+		this.description = description;
 	}
 
 	public String getStart_Date() {
-		return this.Start_Date;
+		return this.start_Date;
 	}
 
 	public void setStart_Date(String start_Date) {
-		this.Start_Date = start_Date;
+		this.start_Date = start_Date;
 	}
 
 	public String getEnd_Date() {
-		return this.End_Date;
+		return this.end_Date;
 	}
 
 	public void setEnd_Date(String end_Date) {
-		this.End_Date = end_Date;
+		this.end_Date = end_Date;
 	}
 
 	public float getPrice() {
-		return this.Price;
+		return this.price;
 	}
 
 	public void setPrice(float price) {
-		this.Price = price;
+		this.price = price;
 	}
-
 }

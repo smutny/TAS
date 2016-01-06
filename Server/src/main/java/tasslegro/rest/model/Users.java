@@ -1,112 +1,112 @@
 package tasslegro.rest.model;
 
 public class Users {
-	private int ID;
-	private String Login = "";
-	private String Pass = "";
-	private String Name = "";
-	private String Surname = "";
-	private String Email = "";
-	private int Phone;
-	private int Account;
-	private String Address = "";
-	private String Town = "";
-	private String ZipCode = "";
+	private int id;
+	private String login = "";
+	private String pass = "";
+	private String name = "";
+	private String surname = "";
+	private String email = "";
+	private int phone;
+	private int account;
+	private String address = "";
+	private String town = "";
+	private String zipCode = "";
 
 	public Users() {
 	}
 
 	public Users(String login, String pass, String email) {
-		this.Login = login;
-		this.Pass = pass;
-		this.Email = email;
+		this.login = login;
+		this.pass = pass;
+		this.email = email;
 	}
 
-	public int getID() {
-		return this.ID;
+	public int getId() {
+		return this.id;
 	}
 
-	public void setID(int id) {
-		this.ID = id;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getLogin() {
-		return this.Login;
+		return this.login;
 	}
 
 	public void setLogin(String login) {
-		this.Login = login;
+		this.login = login;
 	}
 
 	public String getPass() {
-		return this.Pass;
+		return this.pass;
 	}
 
 	public void setPass(String pass) {
-		this.Pass = pass;
+		this.pass = pass;
 	}
 
 	public String getName() {
-		return this.Name;
+		return this.name;
 	}
 
 	public void setName(String name) {
-		this.Name = name;
+		this.name = name;
 	}
 
 	public String getSurname() {
-		return this.Surname;
+		return this.surname;
 	}
 
 	public void setSurname(String surname) {
-		this.Surname = surname;
+		this.surname = surname;
 	}
 
 	public String getEmail() {
-		return this.Email;
+		return this.email;
 	}
 
 	public void setEmail(String email) {
-		this.Email = email;
+		this.email = email;
 	}
 
 	public int getPhone() {
-		return this.Phone;
+		return this.phone;
 	}
 
 	public void setPhone(int phone) {
-		this.Phone = phone;
+		this.phone = phone;
 	}
 
 	public int getAccount() {
-		return this.Account;
+		return this.account;
 	}
 
 	public void setAccount(int account) {
-		this.Account = account;
+		this.account = account;
 	}
 
 	public String getAddress() {
-		return this.Address;
+		return this.address;
 	}
 
 	public void setAddress(String address) {
-		this.Address = address;
+		this.address = address;
 	}
 
 	public String getTown() {
-		return this.Town;
+		return this.town;
 	}
 
 	public void setTown(String town) {
-		this.Town = town;
+		this.town = town;
 	}
 
 	public String getZipCode() {
-		return this.ZipCode;
+		return this.zipCode;
 	}
 
 	public void setZipCode(String zipCode) {
-		this.ZipCode = zipCode;
+		this.zipCode = zipCode;
 	}
 }

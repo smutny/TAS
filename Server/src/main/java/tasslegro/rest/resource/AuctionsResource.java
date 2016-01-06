@@ -97,12 +97,31 @@ public class AuctionsResource {
 
 	@Path("/{id}")
 	@GET
-	@ApiOperation(value = "Get user {id} auctions.")
-	public Response getUser(@PathParam("id") final String id) throws ClassNotFoundException, SQLException {
+	@ApiOperation(value = "Get auction by {id}.")
+	public Response getAuction(@PathParam("id") final String id) throws ClassNotFoundException, SQLException {
 		if (!this.database.IsConnected()) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
 		return null;
 	}
+
+	@Path("/pages/{page}")
+	@GET
+	public Response getAuctions(@PathParam("page") final int page) throws ClassNotFoundException, SQLException {
+		if (!this.database.IsConnected()) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+					.entity("Problem with server! Please try again later!\n").build();
+		}
+		if (page < 1) {
+			return Response.status(Response.Status.NO_CONTENT).entity("Page " + page + " doesn't exist!").build();
+		}
+		List<Auctions> AuctionsList = this.database.getAuctionsByPage(page);
+		if (AuctionsList == null) {
+			return Response.status(Response.Status.NO_CONTENT).entity("No content!").build();
+		} else {
+			return Response.status(Response.Status.OK).entity(AuctionsList).build();
+		}
+	}
+
 }

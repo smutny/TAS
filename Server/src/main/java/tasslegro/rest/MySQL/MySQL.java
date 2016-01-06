@@ -26,6 +26,8 @@ public class MySQL {
 	String SQLQueryString;
 	Boolean Connected = false;
 
+	int selectLimit = 10;
+
 	public MySQL() throws ClassNotFoundException, SQLException {
 		this.Driver = "com.mysql.jdbc.Driver";
 		this.ConnectionDBAddres = "jdbc:mysql://localhost:3306/";
@@ -100,7 +102,7 @@ public class MySQL {
 				List<Users> UserList = new ArrayList<>();
 				while (this.ResultDB.next()) {
 					Users User = new Users();
-					User.setID(this.ResultDB.getInt("User_ID"));
+					User.setId(this.ResultDB.getInt("User_ID"));
 					User.setName(this.ResultDB.getString("Name"));
 					User.setSurname(this.ResultDB.getString("Surname"));
 					User.setEmail(this.ResultDB.getString("Email"));
@@ -133,7 +135,7 @@ public class MySQL {
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Users User = new Users();
 				if (this.ResultDB.next()) {
-					User.setID(this.ResultDB.getInt("User_ID"));
+					User.setId(this.ResultDB.getInt("User_ID"));
 					User.setName(this.ResultDB.getString("Name"));
 					User.setSurname(this.ResultDB.getString("Surname"));
 					User.setEmail(this.ResultDB.getString("Email"));
@@ -173,7 +175,7 @@ public class MySQL {
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Users User = new Users();
 				if (this.ResultDB.next()) {
-					User.setID(this.ResultDB.getInt("User_ID"));
+					User.setId(this.ResultDB.getInt("User_ID"));
 					User.setName(this.ResultDB.getString("Name"));
 					User.setSurname(this.ResultDB.getString("Surname"));
 					User.setEmail(this.ResultDB.getString("Email"));
@@ -303,14 +305,52 @@ public class MySQL {
 	public List<Auctions> getAuctions() throws SQLException {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Title, Description, Start_Date, End_Date, Price "
-						+ "FROM ONLINE_AUCTIONS.AUCTIONS";
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price "
+						+ "FROM ONLINE_AUCTIONS.AUCTIONS_VIEW";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				List<Auctions> AuctionList = new ArrayList<>();
 				while (this.ResultDB.next()) {
 					Auctions Auction = new Auctions();
 					Auction.setAuciton_ID(this.ResultDB.getInt("Auciton_ID"));
 					Auction.setUser_ID(this.ResultDB.getInt("User_ID"));
+					Auction.setImage_ID(this.ResultDB.getInt("Image_ID"));
+					Auction.setTitle(this.ResultDB.getString("Title"));
+					Auction.setDescription(this.ResultDB.getString("Description"));
+					Auction.setStart_Date(this.ResultDB.getString("Start_Date"));
+					Auction.setEnd_Date(this.ResultDB.getString("End_Date"));
+					Auction.setPrice(this.ResultDB.getFloat("Price"));
+					AuctionList.add(Auction);
+				}
+				this.ResultDB = null;
+				return AuctionList;
+			} catch (SQLException error) {
+				this.ResultDB = null;
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return null;
+			}
+		}
+		return null;
+	}
+
+	public List<Auctions> getAuctionsByPage(int page) throws SQLException {
+		if (this.Connected) {
+			if (page < 1) {
+
+				return null;
+			}
+			try {
+				page = (page - 1) * this.selectLimit;
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price "
+						+ "FROM ONLINE_AUCTIONS.AUCTIONS_VIEW LIMIT " + this.selectLimit + " OFFSET " + page;
+				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				List<Auctions> AuctionList = new ArrayList<>();
+				while (this.ResultDB.next()) {
+					Auctions Auction = new Auctions();
+					Auction.setAuciton_ID(this.ResultDB.getInt("Auciton_ID"));
+					Auction.setUser_ID(this.ResultDB.getInt("User_ID"));
+					Auction.setImage_ID(this.ResultDB.getInt("Image_ID"));
 					Auction.setTitle(this.ResultDB.getString("Title"));
 					Auction.setDescription(this.ResultDB.getString("Description"));
 					Auction.setStart_Date(this.ResultDB.getString("Start_Date"));
@@ -334,10 +374,10 @@ public class MySQL {
 	public Auctions addAuction(Auctions auction) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.AUCTIONS(User_ID, Title, Description, Start_Date, End_Date, Price)"
-						+ "VALUES (\"" + auction.getUser_ID() + "\", \"" + auction.getTitle() + "\", \""
-						+ auction.getDescription() + "\", " + "NOW(), " + "DATE_ADD(NOW(),INTERVAL 2 WEEK), "
-						+ auction.getPrice() + " );";
+				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.AUCTIONS(User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price)"
+						+ "VALUES (\"" + auction.getUser_ID() + "\"," + auction.getImage_ID() + ", \""
+						+ auction.getTitle() + "\", \"" + auction.getDescription() + "\", " + "NOW(), "
+						+ "DATE_ADD(NOW(),INTERVAL 2 WEEK), " + auction.getPrice() + " );";
 				this.StatementDB.executeUpdate(this.SQLQueryString);
 				return getAuctionByTitleDescriptionId(auction);
 			} catch (SQLException error) {
@@ -353,7 +393,7 @@ public class MySQL {
 	public Auctions getAuctionByTitleDescriptionId(Auctions auction) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Title, Description, Start_Date, End_Date, Price "
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price "
 						+ "FROM ONLINE_AUCTIONS.AUCTIONS WHERE User_ID = " + auction.getUser_ID() + " AND Title = \""
 						+ auction.getTitle() + "\" AND Description = \"" + auction.getDescription() + "\";";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
@@ -361,6 +401,7 @@ public class MySQL {
 				if (this.ResultDB.next()) {
 					tmp.setAuciton_ID(this.ResultDB.getInt("Auciton_ID"));
 					tmp.setUser_ID(this.ResultDB.getInt("User_ID"));
+					tmp.setImage_ID(this.ResultDB.getInt("Image_ID"));
 					tmp.setTitle(this.ResultDB.getString("Title"));
 					tmp.setDescription(this.ResultDB.getString("Description"));
 					tmp.setStart_Date(this.ResultDB.getString("Start_Date"));
