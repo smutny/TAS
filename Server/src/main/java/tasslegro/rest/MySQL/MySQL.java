@@ -97,7 +97,45 @@ public class MySQL {
 		if (this.Connected) {
 			try {
 				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
-						+ "FROM ONLINE_AUCTIONS.USERS";
+						+ "FROM ONLINE_AUCTIONS.USERS_VIEW";
+				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				List<Users> UserList = new ArrayList<>();
+				while (this.ResultDB.next()) {
+					Users User = new Users();
+					User.setId(this.ResultDB.getInt("User_ID"));
+					User.setName(this.ResultDB.getString("Name"));
+					User.setSurname(this.ResultDB.getString("Surname"));
+					User.setEmail(this.ResultDB.getString("Email"));
+					User.setPhone(this.ResultDB.getInt("Phone"));
+					User.setLogin(this.ResultDB.getString("Login"));
+					User.setAccount(this.ResultDB.getInt("Account"));
+					User.setAddress(this.ResultDB.getString("Address"));
+					User.setTown(this.ResultDB.getString("Town"));
+					User.setZipCode(this.ResultDB.getString("ZipCode"));
+					UserList.add(User);
+				}
+				this.ResultDB = null;
+				return UserList;
+			} catch (SQLException error) {
+				this.ResultDB = null;
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return null;
+			}
+		}
+		return null;
+	}
+
+	public List<Users> getUsersByPage(int page) throws SQLException {
+		if (this.Connected) {
+			if (page < 1) {
+				return null;
+			}
+			try {
+				page = (page - 1) * this.selectLimit;
+				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
+						+ "FROM ONLINE_AUCTIONS.USERS_VIEW LIMIT " + this.selectLimit + " OFFSET " + page;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				List<Users> UserList = new ArrayList<>();
 				while (this.ResultDB.next()) {
@@ -131,7 +169,7 @@ public class MySQL {
 		if (this.Connected) {
 			try {
 				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
-						+ "FROM ONLINE_AUCTIONS.USERS " + "WHERE User_ID = " + id;
+						+ "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE User_ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Users User = new Users();
 				if (this.ResultDB.next()) {
@@ -171,7 +209,7 @@ public class MySQL {
 		if (this.Connected) {
 			try {
 				this.SQLQueryString = "SELECT User_ID, Name, Surname, Email, Phone, Login, Account, Address, Town, ZipCode "
-						+ "FROM ONLINE_AUCTIONS.USERS " + "WHERE Login = \"" + login + "\"";
+						+ "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE Login = \"" + login + "\"";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Users User = new Users();
 				if (this.ResultDB.next()) {
@@ -206,8 +244,8 @@ public class MySQL {
 	public boolean checkExistUserByLogin(String login) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS " + "WHERE Login = \"" + login
-						+ "\"";
+				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE Login = \""
+						+ login + "\"";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				if (this.ResultDB.next()) {
 					this.ResultDB = null;
@@ -230,8 +268,8 @@ public class MySQL {
 	public boolean checkExistUserByEmail(String email) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS " + "WHERE Email = \"" + email
-						+ "\"";
+				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE Email = \""
+						+ email + "\"";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				if (this.ResultDB.next()) {
 					this.ResultDB = null;
@@ -254,7 +292,7 @@ public class MySQL {
 	public boolean checkExistUserById(String id) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS " + "WHERE User_ID = " + id + ";";
+				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE User_ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				if (this.ResultDB.next()) {
 					this.ResultDB = null;
@@ -285,7 +323,7 @@ public class MySQL {
 						+ "VALUES (\"" + user.getName() + "\", \"" + user.getSurname() + "\", \"" + user.getEmail()
 						+ "\", " + user.getPhone() + ", \"" + user.getLogin() + "\",\"" + user.getPass() + "\", "
 						+ user.getAccount() + ", \"" + user.getAddress() + "\", \"" + user.getTown() + "\", \""
-						+ user.getZipCode() + "\" );";
+						+ user.getZipCode() + "\" )";
 				this.StatementDB.executeUpdate(this.SQLQueryString);
 				return getUserByLogin(user.getLogin());
 			} catch (SQLException error) {
@@ -337,7 +375,6 @@ public class MySQL {
 	public List<Auctions> getAuctionsByPage(int page) throws SQLException {
 		if (this.Connected) {
 			if (page < 1) {
-
 				return null;
 			}
 			try {
@@ -377,10 +414,44 @@ public class MySQL {
 				this.SQLQueryString = "INSERT INTO ONLINE_AUCTIONS.AUCTIONS(User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price)"
 						+ "VALUES (\"" + auction.getUser_ID() + "\"," + auction.getImage_ID() + ", \""
 						+ auction.getTitle() + "\", \"" + auction.getDescription() + "\", " + "NOW(), "
-						+ "DATE_ADD(NOW(),INTERVAL 2 WEEK), " + auction.getPrice() + " );";
+						+ "DATE_ADD(NOW(),INTERVAL 2 WEEK), " + auction.getPrice() + " )";
 				this.StatementDB.executeUpdate(this.SQLQueryString);
 				return getAuctionByTitleDescriptionId(auction);
 			} catch (SQLException error) {
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return null;
+			}
+		}
+		return null;
+	}
+
+	public Auctions getAuctionById(int id) {
+		if (this.Connected) {
+			try {
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price "
+						+ "FROM ONLINE_AUCTIONS.AUCTIONS_VIEW WHERE Auciton_ID = " + id;
+				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				Auctions tmp = new Auctions();
+				if (this.ResultDB.next()) {
+					tmp.setAuciton_ID(this.ResultDB.getInt("Auciton_ID"));
+					tmp.setUser_ID(this.ResultDB.getInt("User_ID"));
+					tmp.setImage_ID(this.ResultDB.getInt("Image_ID"));
+					tmp.setTitle(this.ResultDB.getString("Title"));
+					tmp.setDescription(this.ResultDB.getString("Description"));
+					tmp.setStart_Date(this.ResultDB.getString("Start_Date"));
+					tmp.setEnd_Date(this.ResultDB.getString("End_Date"));
+					tmp.setPrice(this.ResultDB.getFloat("Price"));
+				} else {
+					System.out.println("[LOG] " + new Date() + ": Auction with id \"" + id + "\" not found!");
+					this.ResultDB = null;
+					return null;
+				}
+				this.ResultDB = null;
+				return tmp;
+			} catch (SQLException error) {
+				this.ResultDB = null;
 				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
 				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
 						+ " in connection: " + this.ConnectionDBAddres);
@@ -395,7 +466,7 @@ public class MySQL {
 			try {
 				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price "
 						+ "FROM ONLINE_AUCTIONS.AUCTIONS WHERE User_ID = " + auction.getUser_ID() + " AND Title = \""
-						+ auction.getTitle() + "\" AND Description = \"" + auction.getDescription() + "\";";
+						+ auction.getTitle() + "\" AND Description = \"" + auction.getDescription() + "\"";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Auctions tmp = new Auctions();
 				if (this.ResultDB.next()) {
@@ -430,10 +501,39 @@ public class MySQL {
 	 * IMAGES *
 	 */
 
-	public List<Images> getImagesList() throws SQLException {
+	public List<Images> getImages() throws SQLException {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT ID " + "FROM ONLINE_AUCTIONS.IMAGES";
+				this.SQLQueryString = "SELECT ID FROM ONLINE_AUCTIONS.IMAGES_VIEW";
+				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				List<Images> ImageList = new ArrayList<>();
+				while (this.ResultDB.next()) {
+					Images Image = new Images();
+					Image.setId(this.ResultDB.getInt("ID"));
+					ImageList.add(Image);
+				}
+				this.ResultDB = null;
+				return ImageList;
+			} catch (SQLException error) {
+				this.ResultDB = null;
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return null;
+			}
+		}
+		return null;
+	}
+
+	public List<Images> getImagesByPage(int page) throws SQLException {
+		if (this.Connected) {
+			if (page < 1) {
+				return null;
+			}
+			try {
+				page = (page - 1) * this.selectLimit;
+				this.SQLQueryString = "SELECT ID FROM ONLINE_AUCTIONS.IMAGES_VIEW LIMIT " + this.selectLimit
+						+ " OFFSET " + page;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				List<Images> ImageList = new ArrayList<>();
 				while (this.ResultDB.next()) {
@@ -485,7 +585,7 @@ public class MySQL {
 	public Images getImageById(String id) throws SQLException {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT ID, Image " + "FROM ONLINE_AUCTIONS.IMAGES " + "WHERE ID = " + id + ";";
+				this.SQLQueryString = "SELECT ID, Image " + "FROM ONLINE_AUCTIONS.IMAGES_VIEW WHERE ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Images Image = new Images();
 				if (this.ResultDB.next()) {
@@ -511,7 +611,7 @@ public class MySQL {
 	public Images deleteImageById(String id) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "DELETE " + "FROM ONLINE_AUCTIONS.IMAGES " + "WHERE ID = " + id + ";";
+				this.SQLQueryString = "DELETE " + "FROM ONLINE_AUCTIONS.IMAGES WHERE ID = " + id;
 				this.StatementDB.executeUpdate(this.SQLQueryString);
 				Images tmp = new Images();
 				tmp.setId(Integer.parseInt(id));
@@ -534,7 +634,7 @@ public class MySQL {
 	public boolean checkExistImageById(String id) {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT ID " + "FROM ONLINE_AUCTIONS.IMAGES";
+				this.SQLQueryString = "SELECT ID " + "FROM ONLINE_AUCTIONS.IMAGES_VIEW WHERE ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				if (this.ResultDB.next()) {
 					Images Image = new Images();

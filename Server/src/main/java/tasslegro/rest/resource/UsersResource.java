@@ -11,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -38,15 +39,19 @@ public class UsersResource {
 	@GET
 	@ApiOperation(value = "Get list all users.")
 	public Response getUsers() throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
+		cacheControl.setMaxAge(120);
 		List<Users> UserList = this.database.getUsers();
 		if (UserList == null) {
-			return Response.status(Response.Status.NO_CONTENT).entity("No content!").build();
+			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
 		} else {
-			return Response.status(Response.Status.OK).entity(UserList).build();
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(UserList).build();
 		}
 	}
 
@@ -102,19 +107,46 @@ public class UsersResource {
 
 	@Path("/{login}")
 	@GET
-	@ApiOperation(value = "Get all users with {login}.")
+	@ApiOperation(value = "Get information about user with {login}.")
 	public Response getUser(@PathParam("login") final String login) throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
+		cacheControl.setMaxAge(120);
 		Users User = this.database.getUserByLogin(login);
 		if (User == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("User with login \"" + login + "\" not found!\n")
-					.build();
+			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
+					.entity("User with login \"" + login + "\" not found!\n").build();
 		} else {
-			return Response.status(Response.Status.FOUND).entity(User).build();
+			return Response.status(Response.Status.FOUND).cacheControl(cacheControl).entity(User).build();
 		}
 	}
 
+	@Path("/pages/{page}")
+	@GET
+	@ApiOperation(value = "Get user page {page}.")
+	public Response getUser(@PathParam("page") final int page) throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
+		if (!this.database.IsConnected()) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
+					.entity("Problem with server! Please try again later!\n").build();
+		}
+		if (page < 1) {
+			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
+					.entity("Page " + page + " doesn't exist!").build();
+		}
+		cacheControl.setMaxAge(120);
+		List<Users> UserList = this.database.getUsersByPage(page);
+		if (UserList == null) {
+			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
+		} else {
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(UserList).build();
+		}
+	}
 }

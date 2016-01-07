@@ -12,6 +12,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -40,15 +41,19 @@ public class ImagesResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	@ApiOperation(value = "Get all images.")
 	public Response getImages() throws SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
-		List<Images> ImageList = this.database.getImagesList();
+		cacheControl.setMaxAge(120);
+		List<Images> ImageList = this.database.getImages();
 		if (ImageList == null) {
-			return Response.status(Response.Status.NO_CONTENT).entity("No content!").build();
+			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
 		} else {
-			return Response.status(Response.Status.OK).entity(ImageList).build();
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(ImageList).build();
 		}
 	}
 
@@ -90,16 +95,20 @@ public class ImagesResource {
 	@GET
 	@ApiOperation(value = "Get image with {id}.")
 	public Response getImage(@PathParam("id") final String id) throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
+		cacheControl.setMaxAge(360);
 		Images image = this.database.getImageById(id);
 		if (image == null) {
-			return Response.status(Response.Status.NOT_FOUND).entity("Image with id \"" + id + "\" not found!\n")
-					.build();
+			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
+					.entity("Image with id \"" + id + "\" not found!\n").build();
 		} else {
-			return Response.status(Response.Status.FOUND).entity(image.getImage()).build();
+			return Response.status(Response.Status.FOUND).cacheControl(cacheControl).entity(image.getImage()).build();
 		}
 	}
 
@@ -126,6 +135,31 @@ public class ImagesResource {
 			} else {
 				return Response.status(Response.Status.OK).entity(tmp).build();
 			}
+		}
+	}
+
+	@Path("/pages/{page}")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Get image page {page}.")
+	public Response getUser(@PathParam("page") final int page) throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
+		if (!this.database.IsConnected()) {
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
+					.entity("Problem with server! Please try again later!\n").build();
+		}
+		if (page < 1) {
+			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
+					.entity("Page " + page + " doesn't exist!").build();
+		}
+		cacheControl.setMaxAge(120);
+		List<Images> ImageList = this.database.getImagesByPage(page);
+		if (ImageList == null) {
+			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
+		} else {
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(ImageList).build();
 		}
 	}
 }

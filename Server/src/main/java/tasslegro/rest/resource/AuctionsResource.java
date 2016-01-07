@@ -11,6 +11,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -36,17 +37,21 @@ public class AuctionsResource {
 	}
 
 	@GET
-	@ApiOperation(value = "Get list all auctions.")
+	@ApiOperation(value = "Get all auctions.")
 	public Response getAuctions() throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
+		cacheControl.setMaxAge(120);
 		List<Auctions> AuctionsList = this.database.getAuctions();
 		if (AuctionsList == null) {
-			return Response.status(Response.Status.NO_CONTENT).entity("No content!").build();
+			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
 		} else {
-			return Response.status(Response.Status.OK).entity(AuctionsList).build();
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(AuctionsList).build();
 		}
 	}
 
@@ -98,29 +103,46 @@ public class AuctionsResource {
 	@Path("/{id}")
 	@GET
 	@ApiOperation(value = "Get auction by {id}.")
-	public Response getAuction(@PathParam("id") final String id) throws ClassNotFoundException, SQLException {
+	public Response getAuction(@PathParam("id") final int id) throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
-		return null;
+		cacheControl.setMaxAge(120);
+		Auctions Auction = this.database.getAuctionById(id);
+		if (Auction == null) {
+			System.out.println("NULL");
+			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
+					.entity("Auction with id \"" + id + "\" not found!\n").build();
+		} else {
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(Auction).build();
+		}
 	}
 
 	@Path("/pages/{page}")
 	@GET
+	@ApiOperation(value = "Get auction page {page}.")
 	public Response getAuctions(@PathParam("page") final int page) throws ClassNotFoundException, SQLException {
+		CacheControl cacheControl = new CacheControl();
+		cacheControl.setMaxAge(10);
+		cacheControl.setPrivate(false);
 		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+			return Response.status(Response.Status.INTERNAL_SERVER_ERROR).cacheControl(cacheControl)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
 		if (page < 1) {
-			return Response.status(Response.Status.NO_CONTENT).entity("Page " + page + " doesn't exist!").build();
+			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
+					.entity("Page " + page + " doesn't exist!").build();
 		}
+		cacheControl.setMaxAge(120);
 		List<Auctions> AuctionsList = this.database.getAuctionsByPage(page);
 		if (AuctionsList == null) {
-			return Response.status(Response.Status.NO_CONTENT).entity("No content!").build();
+			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
 		} else {
-			return Response.status(Response.Status.OK).entity(AuctionsList).build();
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(AuctionsList).build();
 		}
 	}
 
