@@ -16,7 +16,7 @@ Prostry serwer WWW (REST API) + aplikacja kliencka (Vaadin).
 </br>
 x64
 </br>
-Java 1.7
+Java 1.8
 </br>
 MySQL 5.6.27
 </br>
@@ -28,12 +28,16 @@ Vaadin Framework 7.5.9
 
 #### Pakiety dla Ubuntu:
 
-sudo apt-get install maven mysql-server mysql-client libmysql-java
+`sudo apt-get install openjdk-8-jdk openjdk-8-jde maven mysql-server mysql-client libmysql-java`
 </br>
 </br>
 
 ### Uruchomienie:
 
+Uruchomienie każdej z aplikacje opisane jest:
+* [MySQL](MySQL/README.md)
+* [Server](Server/README.md)
+* [Client](Client/README.md)
 </br>
 </br>
 

@@ -14,7 +14,7 @@ Domyślny adres: <b>localhost:8081</b>
 </br>
 x64
 </br>
-Java 1.7
+Java 1.8
 </br>
 MySQL 5.6.27
 </br>
@@ -26,7 +26,15 @@ Vaadin Framework 7.5.9
 
 #### Pakiety dla Ubuntu:
 
-sudo apt-get install maven
+`sudo apt-get install openjdk-8-jdk openjdk-8-jde maven`
+</br>
+</br>
+
+### Uruchomienie:
+
+Uruchomienie serwera można wykonać na 2 sposoby:
+a. Uruchomienie skryptu <b>run.sh</b> poleceniem `./run.sh` (w razie problemów z uprawnieniami należy wpisać komendę `chmod u+x run.sh`)
+b. Wpisanie poleceń `mvn install` oraz `mvn jetty:run`
 </br>
 </br>
 
@@ -35,5 +43,7 @@ sudo apt-get install maven
 Upewnij się że usługa <b>mysql</b> jest uruchomiona.
 </br>
 Upewnij się że <b>Serwer WWW</b> jest uruchomiony.
+</br>
+Budowanie całej aplikacji klienckiej może zająć kilka minut.
 </br>
 </br>
