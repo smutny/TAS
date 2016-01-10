@@ -33,7 +33,9 @@ Vaadin Framework 7.5.9
 ### Uruchomienie:
 
 Uruchomienie serwera można wykonać na 2 sposoby:
+</br>
 a. Uruchomienie skryptu <b>run.sh</b> poleceniem `./run.sh` (w razie problemów z uprawnieniami należy wpisać komendę `chmod u+x run.sh`)
+</br>
 b. Wpisanie poleceń `mvn install` oraz `mvn jetty:run`
 </br>
 </br>

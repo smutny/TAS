@@ -27,7 +27,9 @@ MySQL 5.6.27
 ### Uruchomienie:
 
 Utworzenie bazy danych można wykonać na 2 sposoby:
+</br>
 a. Uruchomienie skryptu <b>run.sh</b> poleceniem `./run.sh root` (gdzie pierwszy argument jest nazwą użytkownika, np. <b>root</b>), kolejno wpisując hasło użytkownika (w razie problemów z uprawnieniami należy wpisać komendę `chmod u+x run.sh`)
+</br>
 b. Skompilować plik <b>MySQL.java</b> po czym uruchomić
 </br>
 </br>

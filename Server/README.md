@@ -31,7 +31,9 @@ Apache Maven 3.3.3
 ### Uruchomienie:
 
 Uruchomienie klienta można wykonać na 2 sposoby:
+</br>
 a. Uruchomienie skryptu <b>run.sh</b> poleceniem `./run.sh` (w razie problemów z uprawnieniami należy wpisać komendę `chmod u+x run.sh`)
+</br>
 b. Wpisanie polecenia `mvn jetty:run`
 </br>
 </br>
