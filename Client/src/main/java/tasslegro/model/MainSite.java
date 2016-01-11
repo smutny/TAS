@@ -39,6 +39,12 @@ public class MainSite extends CustomComponent implements View {
 			getUI().getNavigator().navigateTo(MyUI.REGISTER);
 		}
 	});
+	Button buttonAuctionInfo = new Button("Auction Info", new Button.ClickListener() {
+		@Override
+		public void buttonClick(ClickEvent event) {
+			getUI().getNavigator().navigateTo(MyUI.AUCTION_INFO);
+		}
+	});
 	Image imageLogo = new Image();
 
 	public MainSite() {
@@ -46,6 +52,7 @@ public class MainSite extends CustomComponent implements View {
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		this.layout = new VerticalLayout();
 		setCompositionRoot(this.layout);
 		this.layout.setSizeFull();
 		this.layout.setMargin(true);
@@ -56,6 +63,7 @@ public class MainSite extends CustomComponent implements View {
 		this.panel.addComponent(this.buttonAuctionAdd);
 		this.panel.addComponent(this.buttonUser);
 		this.panel.addComponent(this.buttonUserAdd);
+		this.panel.addComponent(this.buttonAuctionInfo);
 		this.layout.addComponent(this.panel);
 
 		this.imageLogo.setSource(ImageTasslegro.getImageSource());

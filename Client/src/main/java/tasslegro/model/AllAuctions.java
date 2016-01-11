@@ -21,6 +21,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import tasslegro.MyUI;
@@ -58,11 +59,14 @@ public class AllAuctions extends CustomComponent implements View {
 	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	Date date = null;
 
+	String tmpString = null;
+
 	public AllAuctions() {
 	}
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		this.layout = new VerticalLayout();
 		setCompositionRoot(this.layout);
 		this.layout.setSizeFull();
 		this.layout.setMargin(true);
@@ -103,8 +107,9 @@ public class AllAuctions extends CustomComponent implements View {
 		this.table.addContainerProperty("Opis", String.class, null);
 		this.table.addContainerProperty("Cena (zł)", Double.class, null);
 		this.table.addContainerProperty("Koniec o", String.class, null);
+		this.table.addContainerProperty("Więcej", Button.class, null);
 
-		if (responseString == null) {
+		if (this.responseString == null) {
 		} else {
 			JSONArray jsonArray = new JSONArray(responseString);
 			int counter = 1;
@@ -113,7 +118,7 @@ public class AllAuctions extends CustomComponent implements View {
 				Image tmpImage = new Image();
 				if (objects.getInt("image_ID") > 0) {
 					tmpImage.setSource(new ExternalResource(
-							"http://localhost:8080/images/" + String.valueOf(objects.getInt("image_ID"))));
+							BaseInformation.serverURL + "images/" + String.valueOf(objects.getInt("image_ID"))));
 				} else {
 					tmpImage.setSource(ImageNoImage.getImageSource());
 				}
@@ -128,9 +133,23 @@ public class AllAuctions extends CustomComponent implements View {
 					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
 				}
 
+				tmpString = String.valueOf(objects.getInt("auciton_ID"));
+				Button tmpButton = new Button("Więcej", new Button.ClickListener() {
+					String id = tmpString;
+
+					@Override
+					public void buttonClick(ClickEvent event) {
+						((MyUI) UI.getCurrent()).setIdAuction(id);
+						getUI().getNavigator().navigateTo(MyUI.AUCTION_INFO);
+					}
+				});
+				tmpButton.setDescription("Kliknij po więcej!");
+
 				this.table
-						.addItem(new Object[] { tmpImage, objects.getString("title"), objects.getString("description"),
-								objects.getDouble("price"), this.dateFormat.format(this.date) }, counter++);
+						.addItem(
+								new Object[] { tmpImage, objects.getString("title"), objects.getString("description"),
+										objects.getDouble("price"), this.dateFormat.format(this.date), tmpButton },
+								counter++);
 			}
 		}
 

@@ -82,6 +82,7 @@ public class Register extends CustomComponent implements View, Button.ClickListe
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		this.layout = new VerticalLayout();
 		setCompositionRoot(this.layout);
 		this.layout.setSizeFull();
 		this.layout.setMargin(true);

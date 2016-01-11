@@ -77,6 +77,7 @@ public class AddAuction extends CustomComponent implements View, Button.ClickLis
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		this.layout = new VerticalLayout();
 		setCompositionRoot(this.layout);
 		this.layout.setSizeFull();
 		this.layout.setMargin(true);

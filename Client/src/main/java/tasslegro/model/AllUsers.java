@@ -56,6 +56,7 @@ public class AllUsers extends CustomComponent implements View {
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		this.layout = new VerticalLayout();
 		setCompositionRoot(this.layout);
 		this.layout.setSizeFull();
 		this.layout.setMargin(true);
@@ -102,7 +103,7 @@ public class AllUsers extends CustomComponent implements View {
 		this.table.addContainerProperty("Telefon", Integer.class, null);
 		this.table.addContainerProperty("Numer konta", Integer.class, null);
 
-		if (responseString == null) {
+		if (this.responseString == null) {
 		} else {
 			JSONArray jsonArray = new JSONArray(responseString);
 			int counter = 1;
