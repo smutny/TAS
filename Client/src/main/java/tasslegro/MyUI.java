@@ -14,6 +14,8 @@ import tasslegro.model.AddAuction;
 import tasslegro.model.AllAuctions;
 import tasslegro.model.AllUsers;
 import tasslegro.model.AuctionInfo;
+import tasslegro.model.LoginUser;
+import tasslegro.model.LogoutUser;
 import tasslegro.model.MainSite;
 import tasslegro.model.Register;
 
@@ -28,10 +30,14 @@ public class MyUI extends UI {
 	public static final String AUCTION_ADD = "auction_add";
 	public static final String AUCTION = "auctions";
 	public static final String AUCTION_INFO = "auction_info";
+	public static final String LOGIN_USER = "login_user";
+	public static final String LOGOUT_USER = "logout_user";
 
 	String idAuction = null;
-	String userNick = null;
+	int userId = -1;
+	String userLogin = null;
 	String userPass = null;
+	Boolean logged = false;
 
 	public MyUI() {
 	}
@@ -46,6 +52,8 @@ public class MyUI extends UI {
 		this.navigator.addView(MyUI.AUCTION_ADD, new AddAuction());
 		this.navigator.addView(MyUI.AUCTION, new AllAuctions());
 		this.navigator.addView(MyUI.AUCTION_INFO, new AuctionInfo());
+		this.navigator.addView(MyUI.LOGIN_USER, new LoginUser());
+		this.navigator.addView(MyUI.LOGOUT_USER, new LogoutUser());
 		this.navigator.navigateTo(MyUI.MAIN);
 	}
 
@@ -57,12 +65,20 @@ public class MyUI extends UI {
 		this.idAuction = idAuction;
 	}
 
-	public String getUserNick() {
-		return this.userNick;
+	public int getUserId() {
+		return this.userId;
 	}
 
-	public void setUserNick(String userNick) {
-		this.userNick = userNick;
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public String getUserLogin() {
+		return this.userLogin;
+	}
+
+	public void setUserLogin(String userNick) {
+		this.userLogin = userNick;
 	}
 
 	public String getUserPass() {
@@ -71,6 +87,14 @@ public class MyUI extends UI {
 
 	public void setUserPass(String userPass) {
 		this.userPass = userPass;
+	}
+
+	public Boolean getLogged() {
+		return this.logged;
+	}
+
+	public void setLogged(Boolean logged) {
+		this.logged = logged;
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)

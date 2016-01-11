@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener.ViewChangeEvent;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -32,30 +33,26 @@ import tasslegro.base.ImageTasslegro;
 public class AuctionInfo extends CustomComponent implements View {
 	VerticalLayout layout = new VerticalLayout();
 	HorizontalLayout panel = new HorizontalLayout();
-	Button buttonAuction = new Button("Auction All", new Button.ClickListener() {
+	Button buttonMainSite = new Button("Main Site", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.AUCTION);
+			getUI().getNavigator().navigateTo(MyUI.MAIN);
 		}
 	});
-	Button buttonAuctionAdd = new Button("Add Auction", new Button.ClickListener() {
+	Button buttonLoginUser = new Button("Zaloguj", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.AUCTION_ADD);
+			getUI().getNavigator().navigateTo(MyUI.LOGIN_USER);
 		}
 	});
-	Button buttonUser = new Button("User All", new Button.ClickListener() {
+	Button buttonLogoutUser = new Button("Wyloguj", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.USER);
+			getUI().getNavigator().navigateTo(MyUI.LOGOUT_USER);
 		}
 	});
-	Button buttonUserAdd = new Button("Add User", new Button.ClickListener() {
-		@Override
-		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.REGISTER);
-		}
-	});
+	Label labelNoLogged = new Label("Nie zalogowany!");
+	Label labelLogged = new Label();
 	Image imageLogo = new Image();
 
 	Notification notification = null;
@@ -84,11 +81,19 @@ public class AuctionInfo extends CustomComponent implements View {
 		this.layout.setMargin(true);
 		this.layout.setSpacing(true);
 
+		this.panel = new HorizontalLayout();
 		this.panel.setSpacing(true);
-		this.panel.addComponent(this.buttonAuction);
-		this.panel.addComponent(this.buttonAuctionAdd);
-		this.panel.addComponent(this.buttonUser);
-		this.panel.addComponent(this.buttonUserAdd);
+		this.buttonMainSite.setIcon(FontAwesome.HOME);
+		this.panel.addComponent(this.buttonMainSite);
+		if (((MyUI) UI.getCurrent()).getLogged()) {
+			this.labelLogged = new Label("Zalogowany jako: " + ((MyUI) UI.getCurrent()).getUserLogin());
+			this.panel.addComponent(this.labelLogged);
+			this.panel.addComponent(this.buttonLogoutUser);
+		} else {
+			this.panel.addComponent(this.labelNoLogged);
+			this.buttonLoginUser.setIcon(FontAwesome.LOCK);
+			this.panel.addComponent(this.buttonLoginUser);
+		}
 		this.layout.addComponent(this.panel);
 
 		this.imageLogo.setSource(ImageTasslegro.getImageSource());

@@ -20,6 +20,7 @@ public class MySQL {
 	private String ConnectionDBAddres;
 	Connection ConnectionDB = null;
 	Statement StatementDB = null;
+	PreparedStatement preparedStatement = null;
 	ResultSet ResultDB = null;
 	String UserName;
 	String UserPassword;
@@ -114,6 +115,8 @@ public class MySQL {
 					User.setZipCode(this.ResultDB.getString("ZipCode"));
 					UserList.add(User);
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return UserList;
 			} catch (SQLException error) {
@@ -152,6 +155,8 @@ public class MySQL {
 					User.setZipCode(this.ResultDB.getString("ZipCode"));
 					UserList.add(User);
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return UserList;
 			} catch (SQLException error) {
@@ -188,6 +193,8 @@ public class MySQL {
 					this.ResultDB = null;
 					return null;
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return User;
 			} catch (SQLException error) {
@@ -228,6 +235,8 @@ public class MySQL {
 					this.ResultDB = null;
 					return null;
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return User;
 			} catch (SQLException error) {
@@ -247,6 +256,8 @@ public class MySQL {
 				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE Login = \""
 						+ login + "\"";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				if (this.ResultDB.next()) {
 					this.ResultDB = null;
 					return true;
@@ -271,6 +282,8 @@ public class MySQL {
 				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE Email = \""
 						+ email + "\"";
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				if (this.ResultDB.next()) {
 					this.ResultDB = null;
 					return true;
@@ -294,6 +307,8 @@ public class MySQL {
 			try {
 				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS_VIEW " + "WHERE User_ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				if (this.ResultDB.next()) {
 					this.ResultDB = null;
 					return true;
@@ -325,6 +340,8 @@ public class MySQL {
 						+ user.getAccount() + ", \"" + user.getAddress() + "\", \"" + user.getTown() + "\", \""
 						+ user.getZipCode() + "\" )";
 				this.StatementDB.executeUpdate(this.SQLQueryString);
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				return getUserByLogin(user.getLogin());
 			} catch (SQLException error) {
 				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
@@ -334,6 +351,36 @@ public class MySQL {
 			}
 		}
 		return null;
+	}
+
+	public Boolean checkAuthorization(String login, String pass) {
+		if (this.Connected) {
+			try {
+				this.SQLQueryString = "SELECT User_ID " + "FROM ONLINE_AUCTIONS.USERS "
+						+ "WHERE Login = ? AND Pass = ?";
+				this.preparedStatement = this.ConnectionDB.prepareStatement(this.SQLQueryString);
+				this.preparedStatement.setString(1, login);
+				this.preparedStatement.setString(2, pass);
+				this.ResultDB = this.preparedStatement.executeQuery();
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
+				if (this.ResultDB.next()) {
+					this.preparedStatement = null;
+					this.ResultDB = null;
+					return true;
+				} else {
+					this.preparedStatement = null;
+					this.ResultDB = null;
+					return false;
+				}
+			} catch (SQLException error) {
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return false;
+			}
+		}
+		return false;
 	}
 
 	/*
@@ -359,6 +406,8 @@ public class MySQL {
 					Auction.setPrice(this.ResultDB.getFloat("Price"));
 					AuctionList.add(Auction);
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return AuctionList;
 			} catch (SQLException error) {
@@ -395,6 +444,8 @@ public class MySQL {
 					Auction.setPrice(this.ResultDB.getFloat("Price"));
 					AuctionList.add(Auction);
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return AuctionList;
 			} catch (SQLException error) {
@@ -416,6 +467,8 @@ public class MySQL {
 						+ auction.getTitle() + "\", \"" + auction.getDescription() + "\", " + "NOW(), "
 						+ "DATE_ADD(NOW(),INTERVAL 2 WEEK), " + auction.getPrice() + " )";
 				this.StatementDB.executeUpdate(this.SQLQueryString);
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				return getAuctionByTitleDescriptionId(auction);
 			} catch (SQLException error) {
 				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
@@ -448,6 +501,8 @@ public class MySQL {
 					this.ResultDB = null;
 					return null;
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return tmp;
 			} catch (SQLException error) {
@@ -484,6 +539,8 @@ public class MySQL {
 					this.ResultDB = null;
 					return null;
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return tmp;
 			} catch (SQLException error) {
@@ -512,6 +569,8 @@ public class MySQL {
 					Image.setId(this.ResultDB.getInt("ID"));
 					ImageList.add(Image);
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return ImageList;
 			} catch (SQLException error) {
@@ -541,6 +600,8 @@ public class MySQL {
 					Image.setId(this.ResultDB.getInt("ID"));
 					ImageList.add(Image);
 				}
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				this.ResultDB = null;
 				return ImageList;
 			} catch (SQLException error) {
@@ -562,6 +623,8 @@ public class MySQL {
 				pre.setBlob(1, image.getImage());
 				pre.executeUpdate();
 				this.ResultDB = pre.getGeneratedKeys();
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				if (this.ResultDB.next()) {
 					Images tmp = new Images();
 					tmp.setId(this.ResultDB.getInt(1));
@@ -588,6 +651,8 @@ public class MySQL {
 				this.SQLQueryString = "SELECT ID, Image " + "FROM ONLINE_AUCTIONS.IMAGES WHERE ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Images Image = new Images();
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				if (this.ResultDB.next()) {
 					Image.setId(this.ResultDB.getInt("ID"));
 					Image.setImage(this.ResultDB.getBinaryStream("Image"));
@@ -615,6 +680,8 @@ public class MySQL {
 				this.StatementDB.executeUpdate(this.SQLQueryString);
 				Images tmp = new Images();
 				tmp.setId(Integer.parseInt(id));
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				return tmp;
 			} catch (SQLException error) {
 				this.ResultDB = null;
@@ -636,6 +703,8 @@ public class MySQL {
 			try {
 				this.SQLQueryString = "SELECT ID " + "FROM ONLINE_AUCTIONS.IMAGES_VIEW WHERE ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
 				if (this.ResultDB.next()) {
 					Images Image = new Images();
 					Image.setId(this.ResultDB.getInt("ID"));

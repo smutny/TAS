@@ -17,28 +17,22 @@ import java.util.Scanner;
 
 public class MySQL {
 
-	private String Driver;
-	private String ConnectionDBAddres;
+	private String Driver = "com.mysql.jdbc.Driver";
+	private String ConnectionDBAddres = "jdbc:mysql://localhost:3306/";
 	Connection ConnectionDB = null;
 	Statement StatementDB = null;
 	ResultSet ResultDB = null;
-	String UserName;
-	String UserPassword;
+	String UserName = "root";
+	String UserPassword = "root";
 	String SQLQueryString;
 	Boolean Connected = false;
 
 	public MySQL() {
-		this.Driver = "com.mysql.jdbc.Driver";
-		this.ConnectionDBAddres = "jdbc:mysql://localhost:3306/";
-		this.UserName = "root";
-		this.UserPassword = "root";
 	}
 
 	public MySQL(String driver, String connection_addres) {
 		this.Driver = driver;
 		this.ConnectionDBAddres = connection_addres;
-		this.UserName = "root";
-		this.UserPassword = "root";
 	}
 
 	public void finalize() {

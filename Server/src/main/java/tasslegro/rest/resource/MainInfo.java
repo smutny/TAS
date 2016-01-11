@@ -29,6 +29,7 @@ public class MainInfo {
 		msg += "</body><b>Hello :)</b></br></br><h3>All path:</h3>";
 		msg += "&emsp;<b>/users</b> - list all users</br>";
 		msg += "&emsp;&emsp;<b>/{login}</b> - user <b>login</b></br>";
+		msg += "&emsp;&emsp;<b>/ids/{id}</b> - details user <b>id</b></br>";
 		msg += "&emsp;&emsp;<b>/pages/{id}</b> - page number <b>id</b></br>";
 		msg += "</br>";
 
