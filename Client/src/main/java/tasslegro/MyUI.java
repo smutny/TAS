@@ -33,7 +33,7 @@ public class MyUI extends UI {
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
 		getPage().setTitle("Tasslegro");
-		navigator = new Navigator(this, this);
+		this.navigator = new Navigator(this, this);
 		this.navigator.addView(MyUI.MAIN, new MainSite());
 		this.navigator.addView(MyUI.REGISTER, new Register());
 		this.navigator.addView(MyUI.USER, new AllUsers());

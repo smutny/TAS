@@ -585,7 +585,7 @@ public class MySQL {
 	public Images getImageById(String id) throws SQLException {
 		if (this.Connected) {
 			try {
-				this.SQLQueryString = "SELECT ID, Image " + "FROM ONLINE_AUCTIONS.IMAGES_VIEW WHERE ID = " + id;
+				this.SQLQueryString = "SELECT ID, Image " + "FROM ONLINE_AUCTIONS.IMAGES WHERE ID = " + id;
 				this.ResultDB = this.StatementDB.executeQuery(this.SQLQueryString);
 				Images Image = new Images();
 				if (this.ResultDB.next()) {
