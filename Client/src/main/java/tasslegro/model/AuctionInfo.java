@@ -6,7 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.time.DateUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,7 +21,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
@@ -32,7 +30,7 @@ import tasslegro.base.Http_Get;
 import tasslegro.base.ImageNoImage;
 import tasslegro.base.ImageTasslegro;
 
-public class AllAuctions extends CustomComponent implements View {
+public class AuctionInfo extends CustomComponent implements View {
 	VerticalLayout layout = new VerticalLayout();
 	HorizontalLayout panel = new HorizontalLayout();
 	Button buttonMainSite = new Button("Strona główna", new Button.ClickListener() {
@@ -55,17 +53,24 @@ public class AllAuctions extends CustomComponent implements View {
 	});
 	Label labelNoLogged = new Label("Nie zalogowany!");
 	Label labelLogged = new Label();
+	Image imageLogo = new Image();
+
 	Notification notification = null;
 	String responseString = null;
-	Table table = new Table("Aukcje:");
-	Image imageLogo = new Image();
-	String httpGetURL = BaseInformation.serverURL + "auctions/pages/1";
+	String httpGetURL = BaseInformation.serverURL + "auctions/";
 	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-	Date date = null;
+	Date dateStart = null;
+	Date dateEnd = null;
 
-	String tmpString = null;
+	String idAuction = null;
+	Label auctionTitle = null;
+	Label auctionDescription = null;
+	Label auctionPrice = null;
+	Label auctionDateStart = null;
+	Label auctionDateEnd = null;
+	Image auctionImage = new Image();
 
-	public AllAuctions() {
+	public AuctionInfo() {
 	}
 
 	@Override
@@ -95,81 +100,74 @@ public class AllAuctions extends CustomComponent implements View {
 		this.imageLogo.setSource(ImageTasslegro.getImageSource());
 		this.layout.addComponent(this.imageLogo);
 
-		try {
-			Http_Get get = new Http_Get(this.httpGetURL);
-			this.responseString = get.getStrinResponse();
-			if (get.getStatusCode() == 200) {
-				this.notification = new Notification("OK", "Pobrano dane aukcji", Notification.Type.WARNING_MESSAGE);
-				this.notification.setDelayMsec(5000);
-				this.notification.show(Page.getCurrent());
-			} else {
-				this.notification = new Notification("Error!", this.responseString, Notification.Type.ERROR_MESSAGE);
+		this.idAuction = ((MyUI) UI.getCurrent()).getIdAuction();
+		if (this.idAuction == null) {
+			this.layout.addComponent(new Label("Nie wybrano aukcji!"));
+		} else {
+			try {
+				Http_Get get = new Http_Get(this.httpGetURL + this.idAuction);
+				this.responseString = get.getStrinResponse();
+				if (get.getStatusCode() == 200) {
+					this.notification = new Notification("OK", "Pobrano dane", Notification.Type.WARNING_MESSAGE);
+					this.notification.setDelayMsec(5000);
+					this.notification.show(Page.getCurrent());
+				} else {
+					this.notification = new Notification("Error!", this.responseString,
+							Notification.Type.ERROR_MESSAGE);
+					this.notification.setDelayMsec(5000);
+					this.notification.show(Page.getCurrent());
+					this.responseString = null;
+				}
+			} catch (IOException e) {
+				System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				this.notification = new Notification("Error!", "Problem z połączeniem!",
+						Notification.Type.ERROR_MESSAGE);
 				this.notification.setDelayMsec(5000);
 				this.notification.show(Page.getCurrent());
 				this.responseString = null;
 			}
-		} catch (IOException e) {
-			System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
-			this.notification = new Notification("Error!", "Problem z połączeniem!", Notification.Type.ERROR_MESSAGE);
-			this.notification.setDelayMsec(5000);
-			this.notification.show(Page.getCurrent());
-			this.responseString = null;
-		}
 
-		this.table.addContainerProperty("Grafika", Image.class, null);
-		this.table.addContainerProperty("Tytuł", String.class, null);
-		this.table.addContainerProperty("Opis", String.class, null);
-		this.table.addContainerProperty("Cena (zł)", Double.class, null);
-		this.table.addContainerProperty("Koniec o", String.class, null);
-		this.table.addContainerProperty("Więcej", Button.class, null);
-
-		if (this.responseString == null) {
-		} else {
-			JSONArray jsonArray = new JSONArray(responseString);
-			int counter = 1;
-			for (int i = 0; i < jsonArray.length(); i++) {
-				JSONObject objects = jsonArray.optJSONObject(i);
-				Image tmpImage = new Image();
+			if (this.responseString == null) {
+			} else {
+				JSONObject objects = new JSONObject(this.responseString);
+				this.auctionTitle = new Label(objects.getString("title"));
+				this.layout.addComponent(this.auctionTitle);
+				this.auctionPrice = new Label("Cena: " + String.valueOf(objects.getDouble("price")) + " zł");
+				this.layout.addComponent(this.auctionPrice);
 				if (objects.getInt("image_ID") > 0) {
-					tmpImage.setSource(new ExternalResource(
+					this.auctionImage.setSource(new ExternalResource(
 							BaseInformation.serverURL + "images/" + String.valueOf(objects.getInt("image_ID"))));
 				} else {
-					tmpImage.setSource(ImageNoImage.getImageSource());
+					this.auctionImage.setSource(ImageNoImage.getImageSource());
 				}
-				tmpImage.setWidth("100px");
-				tmpImage.setHeight("100px");
+				this.auctionImage.setWidth("250px");
+				this.auctionImage.setHeight("250px");
+				this.layout.addComponent(this.auctionImage);
+				this.auctionDescription = new Label("Opis: " + objects.getString("description"));
+				this.layout.addComponent(this.auctionDescription);
 				try {
-					this.date = DateUtils.parseDateStrictly(objects.getString("end_Date"),
+					this.dateStart = DateUtils.parseDateStrictly(objects.getString("start_Date"),
 							new String[] { "yyyy-MM-dd HH:mm:ss.S" });
 				} catch (JSONException e) {
 					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
 				} catch (ParseException e) {
 					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
 				}
-
-				tmpString = String.valueOf(objects.getInt("auciton_ID"));
-				Button tmpButton = new Button("Więcej", new Button.ClickListener() {
-					String id = tmpString;
-
-					@Override
-					public void buttonClick(ClickEvent event) {
-						((MyUI) UI.getCurrent()).setIdAuction(id);
-						getUI().getNavigator().navigateTo(MyUI.AUCTION_INFO);
-					}
-				});
-				tmpButton.setDescription("Kliknij po więcej!");
-
-				this.table
-						.addItem(
-								new Object[] { tmpImage, objects.getString("title"), objects.getString("description"),
-										objects.getDouble("price"), this.dateFormat.format(this.date), tmpButton },
-								counter++);
+				this.auctionDateStart = new Label("Wystawiono: " + this.dateFormat.format(this.dateStart));
+				this.layout.addComponent(this.auctionDateStart);
+				try {
+					this.dateEnd = DateUtils.parseDateStrictly(objects.getString("end_Date"),
+							new String[] { "yyyy-MM-dd HH:mm:ss.S" });
+				} catch (JSONException e) {
+					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				} catch (ParseException e) {
+					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				}
+				this.auctionDateEnd = new Label("Koniec: " + this.dateFormat.format(this.dateEnd));
+				this.layout.addComponent(this.auctionDateEnd);
 			}
 		}
 
-		this.table.setHeight("400px");
-		this.table.setWidth("95%");
-		this.table.setColumnCollapsingAllowed(true);
-		this.layout.addComponent(this.table);
 	}
+
 }

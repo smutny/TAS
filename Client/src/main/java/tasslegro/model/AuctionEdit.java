@@ -1,13 +1,13 @@
 package tasslegro.model;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.util.EntityUtils;
+import org.apache.commons.lang3.time.DateUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.vaadin.navigator.View;
@@ -24,16 +24,15 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 
 import tasslegro.MyUI;
 import tasslegro.base.BaseInformation;
-import tasslegro.base.Http_Post;
+import tasslegro.base.Http_Get;
+import tasslegro.base.Http_Put;
 import tasslegro.base.ImageTasslegro;
-import tasslegro.base.ImageUploader;
 
-public class AddAuction extends CustomComponent implements View, Button.ClickListener {
+public class AuctionEdit extends CustomComponent implements View, Button.ClickListener {
 	VerticalLayout layout = new VerticalLayout();
 	HorizontalLayout panel = new HorizontalLayout();
 	Button buttonMainSite = new Button("Strona główna", new Button.ClickListener() {
@@ -57,25 +56,26 @@ public class AddAuction extends CustomComponent implements View, Button.ClickLis
 	Label labelNoLogged = new Label("Nie zalogowany!");
 	Label labelLogged = new Label();
 	Image imageLogo = new Image();
-	TextField auctionTitle = new TextField();
-	TextArea auctionDescription = new TextArea();
-	TextField auctionPrice = new TextField();
-	ImageUploader receiverImage = new ImageUploader();
-	Upload uploadImage = new Upload(null, this.receiverImage);
-	Button auctionButtonAdd = new Button("Wyślij");
-
-	Label labelTitle = new Label("Tytuł:");
-	Label labelDescription = new Label("Opis:");
-	Label labelPrice = new Label("Cena:");
-	Label labelImage = new Label("Zdjęcie:");
-
-	int userId = 1;
 
 	Notification notification = null;
 	String responseString = null;
-	String httpPostURL = BaseInformation.serverURL + "auctions";
+	String httpGetURL = BaseInformation.serverURL + "auctions/";
+	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	Date dateStart = null;
+	Date dateEnd = null;
 
-	public AddAuction() {
+	String idAuction = null;
+	Label labelTitle = new Label("Tytuł:");
+	Label labelDescription = new Label("Opis:");
+	Label Price = new Label("Cena:");
+	TextField auctionTitle = new TextField();
+	TextArea auctionDescription = new TextArea();
+	TextField auctionPrice = new TextField();
+	Label auctionDateStart = null;
+	Label auctionDateEnd = null;
+	Button buttonSend = new Button("Aktualizuj");
+
+	public AuctionEdit() {
 	}
 
 	@Override
@@ -104,25 +104,80 @@ public class AddAuction extends CustomComponent implements View, Button.ClickLis
 
 		this.imageLogo.setSource(ImageTasslegro.getImageSource());
 		this.layout.addComponent(this.imageLogo);
-		this.layout.addComponent(this.labelTitle);
-		this.layout.addComponent(this.auctionTitle);
-		this.layout.addComponent(this.labelDescription);
-		this.layout.addComponent(this.auctionDescription);
-		this.layout.addComponent(this.labelPrice);
-		this.layout.addComponent(this.auctionPrice);
-		this.layout.addComponent(this.labelImage);
-		this.uploadImage.setButtonCaption("Dodaj");
-		this.uploadImage.setImmediate(true);
-		this.layout.addComponent(this.uploadImage);
-		this.auctionButtonAdd.setIcon(FontAwesome.HAND_O_RIGHT);
-		this.auctionButtonAdd.addClickListener(this);
-		this.auctionButtonAdd.setIcon(FontAwesome.SEND);
-		this.layout.addComponent(this.auctionButtonAdd);
+
+		this.idAuction = ((MyUI) UI.getCurrent()).getIdAuction();
+		if (((MyUI) UI.getCurrent()).getLogged() == false) {
+			this.layout.addComponent(new Label("Zaloguj się!"));
+		} else if (this.idAuction == null) {
+			this.layout.addComponent(new Label("Nie wybrano aukcji!"));
+		} else {
+			try {
+				Http_Get get = new Http_Get(this.httpGetURL + this.idAuction);
+				this.responseString = get.getStrinResponse();
+				if (get.getStatusCode() == 200) {
+				} else {
+					this.notification = new Notification("Error!", this.responseString,
+							Notification.Type.ERROR_MESSAGE);
+					this.notification.setDelayMsec(5000);
+					this.notification.show(Page.getCurrent());
+					this.responseString = null;
+					return;
+				}
+			} catch (IOException e) {
+				System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				this.notification = new Notification("Error!", "Problem z połączeniem!",
+						Notification.Type.ERROR_MESSAGE);
+				this.notification.setDelayMsec(5000);
+				this.notification.show(Page.getCurrent());
+				this.responseString = null;
+				return;
+			}
+
+			if (this.responseString == null) {
+			} else {
+				JSONObject objects = new JSONObject(this.responseString);
+				if (objects.getInt("user_ID") != (((MyUI) UI.getCurrent()).getUserId())) {
+					this.layout.addComponent(new Label("Wybierz aukcjię do edycji!"));
+					return;
+				}
+				this.layout.addComponent(this.labelTitle);
+				this.auctionTitle.setValue(objects.getString("title"));
+				this.layout.addComponent(this.auctionTitle);
+				this.layout.addComponent(this.labelDescription);
+				this.auctionDescription.setValue(objects.getString("description"));
+				this.layout.addComponent(this.auctionDescription);
+				this.layout.addComponent(this.Price);
+				this.auctionPrice.setValue(String.valueOf(objects.getDouble("price")));
+				this.layout.addComponent(this.auctionPrice);
+				try {
+					this.dateStart = DateUtils.parseDateStrictly(objects.getString("start_Date"),
+							new String[] { "yyyy-MM-dd HH:mm:ss.S" });
+				} catch (JSONException e) {
+					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				} catch (ParseException e) {
+					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				}
+				this.auctionDateStart = new Label("Wystawiono: " + this.dateFormat.format(this.dateStart));
+				this.layout.addComponent(this.auctionDateStart);
+				try {
+					this.dateEnd = DateUtils.parseDateStrictly(objects.getString("end_Date"),
+							new String[] { "yyyy-MM-dd HH:mm:ss.S" });
+				} catch (JSONException e) {
+					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				} catch (ParseException e) {
+					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
+				}
+				this.auctionDateEnd = new Label("Koniec: " + this.dateFormat.format(this.dateEnd));
+				this.layout.addComponent(this.auctionDateEnd);
+				this.buttonSend.addClickListener(this);
+				this.buttonSend.setIcon(FontAwesome.SEND_O);
+				this.layout.addComponent(this.buttonSend);
+			}
+		}
 	}
 
 	@Override
 	public void buttonClick(ClickEvent event) {
-		int imageId = 0;
 		if (this.auctionTitle.getValue().equals("")) {
 			this.notification = new Notification("Error!", "Tytuł jest wymagany!", Notification.Type.ERROR_MESSAGE);
 			this.notification.setDelayMsec(5000);
@@ -152,55 +207,20 @@ public class AddAuction extends CustomComponent implements View, Button.ClickLis
 			this.notification.setDelayMsec(5000);
 			this.notification.show(Page.getCurrent());
 			return;
-		} else if (this.receiverImage.returnInputStream() != null) {
-			HttpResponse response = this.receiverImage.uploadImage();
-			if (response == null) {
-				this.notification = new Notification("Error!", "Problem z połączeniem!",
-						Notification.Type.ERROR_MESSAGE);
-				this.notification.setDelayMsec(5000);
-				this.notification.show(Page.getCurrent());
-				return;
-			} else {
-				HttpEntity entity = response.getEntity();
-				String responseString = null;
-				try {
-					responseString = EntityUtils.toString(entity, "UTF-8");
-				} catch (ParseException e) {
-					this.notification = new Notification("Error!", "Problem z połączeniem!",
-							Notification.Type.ERROR_MESSAGE);
-					this.notification.setDelayMsec(5000);
-					this.notification.show(Page.getCurrent());
-					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
-					return;
-				} catch (IOException e) {
-					this.notification = new Notification("Error!", "Problem z połączeniem!",
-							Notification.Type.ERROR_MESSAGE);
-					this.notification.setDelayMsec(5000);
-					this.notification.show(Page.getCurrent());
-					System.err.println("[ERROR] " + new Date() + ": " + e.getMessage());
-					return;
-				}
-				if (response.getStatusLine().getStatusCode() == 201) {
-					JSONObject msg = new JSONObject(responseString);
-					imageId = msg.getInt("id");
-				} else {
-					this.notification = new Notification("Error!", responseString, Notification.Type.ERROR_MESSAGE);
-					this.notification.setDelayMsec(5000);
-					this.notification.show(Page.getCurrent());
-					return;
-				}
-			}
 		}
 		JSONObject msg = new JSONObject();
+		msg.put("login", (((MyUI) UI.getCurrent()).getUserLogin()));
+		msg.put("pass", (((MyUI) UI.getCurrent()).getUserPass()));
 		msg.put("title", auctionTitle.getValue());
 		msg.put("description", auctionDescription.getValue());
 		msg.put("price", auctionPrice.getValue());
-		msg.put("user_ID", userId);
-		msg.put("image_ID", imageId);
+		msg.put("user_ID", (((MyUI) UI.getCurrent()).getUserId()));
+		msg.put("auciton_ID", this.idAuction);
 		try {
-			Http_Post post = new Http_Post(this.httpPostURL, msg.toString());
-			if (post.getStatusCode() == 201) {
-				this.notification = new Notification("OK", "Pomyślnie dodano aukcjię!",
+			Http_Put put = new Http_Put(this.httpGetURL, msg.toString());
+			responseString = put.getStrinResponse();
+			if (put.getStatusCode() == 201) {
+				this.notification = new Notification("OK", "Pomyślnie zaktualizowano aukcjię!",
 						Notification.Type.WARNING_MESSAGE);
 				this.notification.setDelayMsec(5000);
 				this.notification.show(Page.getCurrent());
@@ -216,5 +236,4 @@ public class AddAuction extends CustomComponent implements View, Button.ClickLis
 			this.notification.show(Page.getCurrent());
 		}
 	}
-
 }

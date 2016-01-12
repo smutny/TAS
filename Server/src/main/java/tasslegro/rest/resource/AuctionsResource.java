@@ -19,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import tasslegro.rest.MySQL.MySQL;
 import tasslegro.rest.model.Auctions;
+import tasslegro.rest.model.AuctionsAuth;
 
 @Path("/auctions")
 @Api(value = "auctions")
@@ -86,12 +87,37 @@ public class AuctionsResource {
 
 	@PUT
 	@ApiOperation(value = "Update auction.")
-	public Response updateAuction(Auctions auction) {
+	public Response updateAuction(AuctionsAuth auction) {
 		if (!this.database.IsConnected()) {
 			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 					.entity("Problem with server! Please try again later!\n").build();
 		}
-		return null;
+		if (auction.getTitle().isEmpty()) {
+			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Title is required!\n").build();
+		} else if (auction.getDescription().isEmpty()) {
+			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Description is required!\n").build();
+		} else if (auction.getPrice() <= 0) {
+			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Price must be greater than zero!\n").build();
+		} else if (auction.getUser_ID() == 0) {
+			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("User ID is required!\n").build();
+		} else if (this.database.checkExistUserById(auction.getUser_ID()) == false) {
+			return Response.status(Response.Status.CONFLICT)
+					.entity("User with id \"" + auction.getUser_ID() + "\" not found!\n").build();
+		} else if (this.database.checkAuthorization(auction.getLogin(), auction.getPass()) == false) {
+			return Response.status(Response.Status.UNAUTHORIZED).entity("NOT_FOUND").build();
+		} else if (this.database.checkExistAuctionByIds(auction.getAuciton_ID(), auction.getUser_ID()) == false) {
+			return Response.status(Response.Status.CONFLICT).entity("Wrong data!\n").build();
+		} else {
+			Auctions tmp = this.database.updateAuction(auction);
+			if (tmp == null) {
+				System.out.println("NULL");
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity("Problem with server! Please try again later!\n").build();
+			} else {
+				System.out.println("ADD");
+				return Response.status(Response.Status.CREATED).entity(tmp).build();
+			}
+		}
 	}
 
 	@DELETE

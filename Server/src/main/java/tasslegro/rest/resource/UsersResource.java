@@ -58,29 +58,33 @@ public class UsersResource {
 	@POST
 	@ApiOperation(value = "Add user.")
 	public Response addUser(Users user) throws ClassNotFoundException, SQLException {
-		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("Problem with server! Please try again later!\n").build();
-		}
-		if (user.getEmail().isEmpty()) {
-			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Email is required!\n").build();
-		} else if (user.getLogin().isEmpty()) {
-			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Login is required!\n").build();
-		} else if (user.getPass().isEmpty()) {
-			return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Password is required!\n").build();
-		} else if (this.database.checkExistUserByLogin(user.getLogin())) {
-			return Response.status(Response.Status.CONFLICT)
-					.entity("User with login \"" + user.getLogin() + "\" exists!\n").build();
-		} else if (this.database.checkExistUserByEmail(user.getEmail())) {
-			return Response.status(Response.Status.CONFLICT)
-					.entity("User with email \"" + user.getEmail() + "\" exists!\n").build();
+		if (user == null) {
+			return Response.status(Response.Status.CONFLICT).entity("Get user to add!").build();
 		} else {
-			Users tmp = this.database.addUser(user);
-			if (tmp == null) {
+			if (!this.database.IsConnected()) {
 				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
 						.entity("Problem with server! Please try again later!\n").build();
+			}
+			if (user.getEmail().isEmpty()) {
+				return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Email is required!\n").build();
+			} else if (user.getLogin().isEmpty()) {
+				return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Login is required!\n").build();
+			} else if (user.getPass().isEmpty()) {
+				return Response.status(Response.Status.NOT_ACCEPTABLE).entity("Password is required!\n").build();
+			} else if (this.database.checkExistUserByLogin(user.getLogin())) {
+				return Response.status(Response.Status.CONFLICT)
+						.entity("User with login \"" + user.getLogin() + "\" exists!\n").build();
+			} else if (this.database.checkExistUserByEmail(user.getEmail())) {
+				return Response.status(Response.Status.CONFLICT)
+						.entity("User with email \"" + user.getEmail() + "\" exists!\n").build();
 			} else {
-				return Response.status(Response.Status.CREATED).entity(tmp).build();
+				Users tmp = this.database.addUser(user);
+				if (tmp == null) {
+					return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+							.entity("Problem with server! Please try again later!\n").build();
+				} else {
+					return Response.status(Response.Status.CREATED).entity(tmp).build();
+				}
 			}
 		}
 	}
@@ -88,21 +92,29 @@ public class UsersResource {
 	@PUT
 	@ApiOperation(value = "Update user.")
 	public Response updateUser(Users user) {
-		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("Problem with server! Please try again later!\n").build();
+		if (user == null) {
+			return Response.status(Response.Status.CONFLICT).entity("Get user to add!").build();
+		} else {
+			if (!this.database.IsConnected()) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity("Problem with server! Please try again later!\n").build();
+			}
+			return null;
 		}
-		return null;
 	}
 
 	@DELETE
 	@ApiOperation(value = "Delete user.")
 	public Response deleteUser(Users user) {
-		if (!this.database.IsConnected()) {
-			return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-					.entity("Problem with server! Please try again later!\n").build();
+		if (user == null) {
+			return Response.status(Response.Status.CONFLICT).entity("Get user to add!").build();
+		} else {
+			if (!this.database.IsConnected()) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity("Problem with server! Please try again later!\n").build();
+			}
+			return null;
 		}
-		return null;
 	}
 
 	@Path("/{login}")
@@ -122,7 +134,7 @@ public class UsersResource {
 			return Response.status(Response.Status.CONFLICT).cacheControl(cacheControl)
 					.entity("User with login \"" + login + "\" not found!\n").build();
 		} else {
-			return Response.status(Response.Status.FOUND).cacheControl(cacheControl).entity(User).build();
+			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(User).build();
 		}
 	}
 
@@ -147,6 +159,35 @@ public class UsersResource {
 			return Response.status(Response.Status.NOT_FOUND).cacheControl(cacheControl).entity("No content!").build();
 		} else {
 			return Response.status(Response.Status.OK).cacheControl(cacheControl).entity(UserList).build();
+		}
+	}
+
+	@Path("/ids/{id}")
+	@POST
+	@ApiOperation(value = "Get details about user {id}.")
+	public Response getUserDetail(@PathParam("id") final int id, Users user)
+			throws ClassNotFoundException, SQLException {
+		if (user == null) {
+			return Response.status(Response.Status.CONFLICT).entity("Get your id!").build();
+		} else {
+			if (!this.database.IsConnected()) {
+				return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+						.entity("Problem with server! Please try again later!\n").build();
+			}
+			if (this.database.checkAuthorization(user.getLogin(), user.getPass())) {
+				if (id != user.getId()) {
+					return Response.status(Response.Status.CONFLICT).entity("Wrong user id!").build();
+				}
+				Users User = this.database.getUserById(id);
+				if (User == null) {
+					return Response.status(Response.Status.CONFLICT).entity("User with id \"" + id + "\" not found!\n")
+							.build();
+				} else {
+					return Response.status(Response.Status.OK).entity(User).build();
+				}
+			} else {
+				return Response.status(Response.Status.UNAUTHORIZED).entity("NOT_FOUND").build();
+			}
 		}
 	}
 }

@@ -18,6 +18,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 import tasslegro.MyUI;
@@ -28,24 +29,26 @@ import tasslegro.base.ImageTasslegro;
 public class Register extends CustomComponent implements View, Button.ClickListener {
 	VerticalLayout layout = new VerticalLayout();
 	HorizontalLayout panel = new HorizontalLayout();
-	Button buttonAuction = new Button("Auction All", new Button.ClickListener() {
+	Button buttonMainSite = new Button("Strona główna", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.AUCTION);
+			getUI().getNavigator().navigateTo(MyUI.MAIN);
 		}
 	});
-	Button buttonAuctionAdd = new Button("Add Auction", new Button.ClickListener() {
+	Button buttonLoginUser = new Button("Zaloguj", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.AUCTION_ADD);
+			getUI().getNavigator().navigateTo(MyUI.LOGIN_USER);
 		}
 	});
-	Button buttonUser = new Button("User All", new Button.ClickListener() {
+	Button buttonLogoutUser = new Button("Wyloguj", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
-			getUI().getNavigator().navigateTo(MyUI.USER);
+			getUI().getNavigator().navigateTo(MyUI.LOGOUT_USER);
 		}
 	});
+	Label labelNoLogged = new Label("Nie zalogowany!");
+	Label labelLogged = new Label();
 	Image imageLogo = new Image();
 	TextField name = new TextField();
 	TextField surname = new TextField();
@@ -82,15 +85,26 @@ public class Register extends CustomComponent implements View, Button.ClickListe
 
 	@Override
 	public void enter(ViewChangeEvent event) {
+		this.layout = new VerticalLayout();
 		setCompositionRoot(this.layout);
 		this.layout.setSizeFull();
 		this.layout.setMargin(true);
 		this.layout.setSpacing(true);
 
+		this.panel = new HorizontalLayout();
 		this.panel.setSpacing(true);
-		this.panel.addComponent(this.buttonAuction);
-		this.panel.addComponent(this.buttonAuctionAdd);
-		this.panel.addComponent(this.buttonUser);
+		this.buttonMainSite.setIcon(FontAwesome.HOME);
+		this.panel.addComponent(this.buttonMainSite);
+		if (((MyUI) UI.getCurrent()).getLogged()) {
+			this.labelLogged = new Label("Zalogowany jako: " + ((MyUI) UI.getCurrent()).getUserLogin());
+			this.panel.addComponent(this.labelLogged);
+			this.buttonLogoutUser.setIcon(FontAwesome.LOCK);
+			this.panel.addComponent(this.buttonLogoutUser);
+		} else {
+			this.panel.addComponent(this.labelNoLogged);
+			this.buttonLoginUser.setIcon(FontAwesome.LOCK);
+			this.panel.addComponent(this.buttonLoginUser);
+		}
 		this.layout.addComponent(this.panel);
 
 		this.imageLogo.setSource(ImageTasslegro.getImageSource());
@@ -104,14 +118,11 @@ public class Register extends CustomComponent implements View, Button.ClickListe
 		this.layout.addComponent(this.labelPhone);
 		this.layout.addComponent(this.phone);
 		this.layout.addComponent(this.labelLogin);
-		this.login = new TextField();
 		this.login.setValidationVisible(true);
 		this.layout.addComponent(this.login);
 		this.layout.addComponent(this.labelPass);
-		this.pass = new PasswordField();
 		this.layout.addComponent(this.pass);
 		this.layout.addComponent(this.labelPassrep);
-		this.passrep = new PasswordField();
 		this.layout.addComponent(this.passrep);
 		this.layout.addComponent(this.labelAddress);
 		this.layout.addComponent(this.address);
@@ -120,39 +131,39 @@ public class Register extends CustomComponent implements View, Button.ClickListe
 		this.layout.addComponent(this.labelZipCode);
 		this.layout.addComponent(this.zipCode);
 		this.layout.addComponent(require);
-		this.register.setIcon(FontAwesome.HAND_O_RIGHT);
+		this.register.setIcon(FontAwesome.SEND);
 		this.register.addClickListener(this);
 		this.layout.addComponent(this.register);
 	}
 
 	@Override
 	public void buttonClick(ClickEvent event) {
-		if (login.getValue().equals("")) {
+		if (this.login.getValue().equals("")) {
 			this.notification = new Notification("Error!", "Login jest wymagany!", Notification.Type.ERROR_MESSAGE);
 			this.notification.setDelayMsec(5000);
 			this.notification.show(Page.getCurrent());
 			return;
 		}
-		if (email.getValue().equals("")) {
+		if (this.email.getValue().equals("")) {
 			this.notification = new Notification("Error!", "Email jest wymagany!", Notification.Type.ERROR_MESSAGE);
 			this.notification.setDelayMsec(5000);
 			this.notification.show(Page.getCurrent());
 			return;
 		}
-		if (pass.getValue().equals("")) {
+		if (this.pass.getValue().equals("")) {
 			this.notification = new Notification("Error!", "Hasło jest wymagane!", Notification.Type.ERROR_MESSAGE);
 			this.notification.setDelayMsec(5000);
 			this.notification.show(Page.getCurrent());
 			return;
 		}
-		if (passrep.getValue().equals("")) {
+		if (this.passrep.getValue().equals("")) {
 			this.notification = new Notification("Error!", "Powtórz Hasło jest wymagane!",
 					Notification.Type.ERROR_MESSAGE);
 			this.notification.setDelayMsec(5000);
 			this.notification.show(Page.getCurrent());
 			return;
 		}
-		if (!pass.getValue().equals(passrep.getValue())) {
+		if (!this.pass.getValue().equals(this.passrep.getValue())) {
 			this.notification = new Notification("Error!", "Hasła nie są takie same!", Notification.Type.ERROR_MESSAGE);
 			this.notification.setDelayMsec(5000);
 			this.notification.show(Page.getCurrent());

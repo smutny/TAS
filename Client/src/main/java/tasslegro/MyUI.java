@@ -13,6 +13,10 @@ import com.vaadin.ui.UI;
 import tasslegro.model.AddAuction;
 import tasslegro.model.AllAuctions;
 import tasslegro.model.AllUsers;
+import tasslegro.model.AuctionEdit;
+import tasslegro.model.AuctionInfo;
+import tasslegro.model.LoginUser;
+import tasslegro.model.LogoutUser;
 import tasslegro.model.MainSite;
 import tasslegro.model.Register;
 
@@ -26,6 +30,16 @@ public class MyUI extends UI {
 	public static final String REGISTER = "register";
 	public static final String AUCTION_ADD = "auction_add";
 	public static final String AUCTION = "auctions";
+	public static final String AUCTION_INFO = "auction_info";
+	public static final String AUCTION_EDIT = "auction_edit";
+	public static final String LOGIN_USER = "login_user";
+	public static final String LOGOUT_USER = "logout_user";
+
+	String idAuction = null;
+	int userId = -1;
+	String userLogin = null;
+	String userPass = null;
+	Boolean logged = false;
 
 	public MyUI() {
 	}
@@ -33,13 +47,57 @@ public class MyUI extends UI {
 	@Override
 	protected void init(VaadinRequest vaadinRequest) {
 		getPage().setTitle("Tasslegro");
-		navigator = new Navigator(this, this);
+		this.navigator = new Navigator(this, this);
 		this.navigator.addView(MyUI.MAIN, new MainSite());
 		this.navigator.addView(MyUI.REGISTER, new Register());
 		this.navigator.addView(MyUI.USER, new AllUsers());
 		this.navigator.addView(MyUI.AUCTION_ADD, new AddAuction());
 		this.navigator.addView(MyUI.AUCTION, new AllAuctions());
+		this.navigator.addView(MyUI.AUCTION_INFO, new AuctionInfo());
+		this.navigator.addView(MyUI.AUCTION_EDIT, new AuctionEdit());
+		this.navigator.addView(MyUI.LOGIN_USER, new LoginUser());
+		this.navigator.addView(MyUI.LOGOUT_USER, new LogoutUser());
 		this.navigator.navigateTo(MyUI.MAIN);
+	}
+
+	public String getIdAuction() {
+		return this.idAuction;
+	}
+
+	public void setIdAuction(String idAuction) {
+		this.idAuction = idAuction;
+	}
+
+	public int getUserId() {
+		return this.userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public String getUserLogin() {
+		return this.userLogin;
+	}
+
+	public void setUserLogin(String userNick) {
+		this.userLogin = userNick;
+	}
+
+	public String getUserPass() {
+		return this.userPass;
+	}
+
+	public void setUserPass(String userPass) {
+		this.userPass = userPass;
+	}
+
+	public Boolean getLogged() {
+		return this.logged;
+	}
+
+	public void setLogged(Boolean logged) {
+		this.logged = logged;
 	}
 
 	@WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
