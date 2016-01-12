@@ -123,7 +123,6 @@ public class LoginUser extends CustomComponent implements View, Button.ClickList
 			msg.put("id", objects.getInt("id"));
 			msg.put("login", this.login.getValue());
 			msg.put("pass", this.pass.getValue());
-			System.out.println(msg.toString());
 			try {
 				Http_Post post = new Http_Post(this.httpPostURL + "1", msg.toString());
 				if (post.getStatusCode() == 201 || post.getStatusCode() == 200) {

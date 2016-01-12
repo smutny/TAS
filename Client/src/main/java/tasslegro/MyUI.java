@@ -13,6 +13,7 @@ import com.vaadin.ui.UI;
 import tasslegro.model.AddAuction;
 import tasslegro.model.AllAuctions;
 import tasslegro.model.AllUsers;
+import tasslegro.model.AuctionEdit;
 import tasslegro.model.AuctionInfo;
 import tasslegro.model.LoginUser;
 import tasslegro.model.LogoutUser;
@@ -30,6 +31,7 @@ public class MyUI extends UI {
 	public static final String AUCTION_ADD = "auction_add";
 	public static final String AUCTION = "auctions";
 	public static final String AUCTION_INFO = "auction_info";
+	public static final String AUCTION_EDIT = "auction_edit";
 	public static final String LOGIN_USER = "login_user";
 	public static final String LOGOUT_USER = "logout_user";
 
@@ -52,6 +54,7 @@ public class MyUI extends UI {
 		this.navigator.addView(MyUI.AUCTION_ADD, new AddAuction());
 		this.navigator.addView(MyUI.AUCTION, new AllAuctions());
 		this.navigator.addView(MyUI.AUCTION_INFO, new AuctionInfo());
+		this.navigator.addView(MyUI.AUCTION_EDIT, new AuctionEdit());
 		this.navigator.addView(MyUI.LOGIN_USER, new LoginUser());
 		this.navigator.addView(MyUI.LOGOUT_USER, new LogoutUser());
 		this.navigator.navigateTo(MyUI.MAIN);

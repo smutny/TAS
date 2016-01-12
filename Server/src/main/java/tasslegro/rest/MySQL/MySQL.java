@@ -22,6 +22,7 @@ public class MySQL {
 	Statement StatementDB = null;
 	PreparedStatement preparedStatement = null;
 	ResultSet ResultDB = null;
+	int ResultDBCount = 0;
 	String UserName;
 	String UserPassword;
 	String SQLQueryString;
@@ -480,6 +481,39 @@ public class MySQL {
 		return null;
 	}
 
+	public Auctions updateAuction(Auctions auction) {
+		if (this.Connected) {
+			try {
+				this.SQLQueryString = "UPDATE ONLINE_AUCTIONS.AUCTIONS SET Title = ?, Description = ?, Price = ? WHERE Auciton_ID = ?";
+				this.preparedStatement = this.ConnectionDB.prepareStatement(this.SQLQueryString);
+				this.preparedStatement.setString(1, auction.getTitle());
+				this.preparedStatement.setString(2, auction.getDescription());
+				this.preparedStatement.setFloat(3, auction.getPrice());
+				this.preparedStatement.setFloat(4, auction.getAuciton_ID());
+				this.preparedStatement.executeUpdate();
+				this.ResultDBCount = this.preparedStatement.getUpdateCount();
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
+				if (this.ResultDBCount > 0) {
+					this.preparedStatement = null;
+					this.ResultDB = null;
+					System.out.println("OK!!!");
+					return auction;
+				} else {
+					this.preparedStatement = null;
+					this.ResultDB = null;
+					return null;
+				}
+			} catch (SQLException error) {
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return null;
+			}
+		}
+		return null;
+	}
+
 	public Auctions getAuctionById(int id) {
 		if (this.Connected) {
 			try {
@@ -552,6 +586,36 @@ public class MySQL {
 			}
 		}
 		return null;
+	}
+
+	public Boolean checkExistAuctionByIds(int auction_id, int user_id) {
+		if (this.Connected) {
+			try {
+				this.SQLQueryString = "SELECT Auciton_ID, User_ID, Image_ID, Title, Description, Start_Date, End_Date, Price "
+						+ "FROM ONLINE_AUCTIONS.AUCTIONS_VIEW WHERE Auciton_ID = ? AND User_ID = ?";
+				this.preparedStatement = this.ConnectionDB.prepareStatement(this.SQLQueryString);
+				this.preparedStatement.setInt(1, auction_id);
+				this.preparedStatement.setInt(2, user_id);
+				this.ResultDB = this.preparedStatement.executeQuery();
+				System.out.println("[LOG] " + new Date() + ": Done query: " + this.SQLQueryString + " in connection: "
+						+ this.ConnectionDBAddres);
+				if (this.ResultDB.next()) {
+					this.preparedStatement = null;
+					this.ResultDB = null;
+					return true;
+				} else {
+					this.preparedStatement = null;
+					this.ResultDB = null;
+					return false;
+				}
+			} catch (SQLException error) {
+				System.err.println("[ERROR] " + new Date() + ": " + error.getMessage());
+				System.err.println("[ERROR] " + new Date() + ": Can not do query: " + this.SQLQueryString
+						+ " in connection: " + this.ConnectionDBAddres);
+				return false;
+			}
+		}
+		return false;
 	}
 
 	/*

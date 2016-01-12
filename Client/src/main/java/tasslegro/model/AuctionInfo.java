@@ -33,7 +33,7 @@ import tasslegro.base.ImageTasslegro;
 public class AuctionInfo extends CustomComponent implements View {
 	VerticalLayout layout = new VerticalLayout();
 	HorizontalLayout panel = new HorizontalLayout();
-	Button buttonMainSite = new Button("Main Site", new Button.ClickListener() {
+	Button buttonMainSite = new Button("Strona główna", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
 			getUI().getNavigator().navigateTo(MyUI.MAIN);
@@ -88,6 +88,7 @@ public class AuctionInfo extends CustomComponent implements View {
 		if (((MyUI) UI.getCurrent()).getLogged()) {
 			this.labelLogged = new Label("Zalogowany jako: " + ((MyUI) UI.getCurrent()).getUserLogin());
 			this.panel.addComponent(this.labelLogged);
+			this.buttonLogoutUser.setIcon(FontAwesome.LOCK);
 			this.panel.addComponent(this.buttonLogoutUser);
 		} else {
 			this.panel.addComponent(this.labelNoLogged);
@@ -107,8 +108,7 @@ public class AuctionInfo extends CustomComponent implements View {
 				Http_Get get = new Http_Get(this.httpGetURL + this.idAuction);
 				this.responseString = get.getStrinResponse();
 				if (get.getStatusCode() == 200) {
-					this.notification = new Notification("OK", "Pobrano dane użytkowników",
-							Notification.Type.WARNING_MESSAGE);
+					this.notification = new Notification("OK", "Pobrano dane", Notification.Type.WARNING_MESSAGE);
 					this.notification.setDelayMsec(5000);
 					this.notification.show(Page.getCurrent());
 				} else {

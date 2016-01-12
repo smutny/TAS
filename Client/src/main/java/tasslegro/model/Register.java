@@ -29,7 +29,7 @@ import tasslegro.base.ImageTasslegro;
 public class Register extends CustomComponent implements View, Button.ClickListener {
 	VerticalLayout layout = new VerticalLayout();
 	HorizontalLayout panel = new HorizontalLayout();
-	Button buttonMainSite = new Button("Main Site", new Button.ClickListener() {
+	Button buttonMainSite = new Button("Strona główna", new Button.ClickListener() {
 		@Override
 		public void buttonClick(ClickEvent event) {
 			getUI().getNavigator().navigateTo(MyUI.MAIN);
@@ -98,6 +98,7 @@ public class Register extends CustomComponent implements View, Button.ClickListe
 		if (((MyUI) UI.getCurrent()).getLogged()) {
 			this.labelLogged = new Label("Zalogowany jako: " + ((MyUI) UI.getCurrent()).getUserLogin());
 			this.panel.addComponent(this.labelLogged);
+			this.buttonLogoutUser.setIcon(FontAwesome.LOCK);
 			this.panel.addComponent(this.buttonLogoutUser);
 		} else {
 			this.panel.addComponent(this.labelNoLogged);
