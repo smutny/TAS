@@ -124,7 +124,8 @@ public class LoginUser extends CustomComponent implements View, Button.ClickList
 			msg.put("login", this.login.getValue());
 			msg.put("pass", this.pass.getValue());
 			try {
-				Http_Post post = new Http_Post(this.httpPostURL + "1", msg.toString());
+				Http_Post post = new Http_Post(this.httpPostURL + String.valueOf(objects.getInt("id")), msg.toString());
+				this.responseString = post.getStrinResponse();
 				if (post.getStatusCode() == 201 || post.getStatusCode() == 200) {
 					this.notification = new Notification("OK", "Pomyślnie zalogowano!",
 							Notification.Type.WARNING_MESSAGE);
@@ -140,6 +141,7 @@ public class LoginUser extends CustomComponent implements View, Button.ClickList
 				} else {
 					this.notification = new Notification("Error!", responseString, Notification.Type.ERROR_MESSAGE);
 					this.notification.setDelayMsec(5000);
+					System.out.println(post.getStatusCode());
 					this.notification.show(Page.getCurrent());
 					return;
 				}
