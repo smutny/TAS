@@ -116,6 +116,7 @@ public class AddAuction extends CustomComponent implements View, Button.ClickLis
 		this.layout.addComponent(this.uploadImage);
 		this.auctionButtonAdd.setIcon(FontAwesome.HAND_O_RIGHT);
 		this.auctionButtonAdd.addClickListener(this);
+		this.auctionButtonAdd.setIcon(FontAwesome.SEND);
 		this.layout.addComponent(this.auctionButtonAdd);
 	}
 

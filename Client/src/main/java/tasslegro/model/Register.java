@@ -131,7 +131,7 @@ public class Register extends CustomComponent implements View, Button.ClickListe
 		this.layout.addComponent(this.labelZipCode);
 		this.layout.addComponent(this.zipCode);
 		this.layout.addComponent(require);
-		this.register.setIcon(FontAwesome.HAND_O_RIGHT);
+		this.register.setIcon(FontAwesome.SEND);
 		this.register.addClickListener(this);
 		this.layout.addComponent(this.register);
 	}
